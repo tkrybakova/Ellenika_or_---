@@ -55,28 +55,25 @@ function capitalize(str) {
 
 function renderLevelButtons(levels, startFn) {
   const descriptions = {
-    easy: ['EASY', 'Choose the correct answer', '01'],
-    medium: ['MEDIUM', 'Recall it without options', '02'],
-    hard: ['HARD', 'Complete the full form', '03']
+    easy: ['EASY', 'Choose an answer'],
+    medium: ['MEDIUM', 'Recall from memory'],
+    hard: ['HARD', 'Build the form']
   };
 
   return `
-    <div class="practice-intro">
-      <p>Choose a difficulty level</p>
-      <span>${levels.length} levels available</span>
-    </div>
-    <div class="level-grid">
-      ${levels.map(level => {
-        const item = descriptions[level] || [capitalize(level), 'Practice', ''];
-        return `
-          <button class="level-card level-${level}" onclick="${startFn}('${level}')">
-            <span class="level-number">${item[2]}</span>
-            <span class="level-name">${item[0]}</span>
-            <span class="level-description">${item[1]}</span>
-            <span class="level-arrow">→</span>
-          </button>
-        `;
-      }).join('')}
+    <div class="practice-selector">
+      <div>
+        <span class="selector-label">PRACTICE</span>
+        <p>Choose how you want to train.</p>
+      </div>
+      <div class="level-tabs">
+        ${levels.map((level, index) => {
+          const item = descriptions[level] || [capitalize(level), 'Practice'];
+          return `<button class="level-tab level-${level}" onclick="${startFn}('${level}')">
+            <span>${item[0]}</span><small>${item[1]}</small>
+          </button>`;
+        }).join('')}
+      </div>
     </div>
   `;
 }
