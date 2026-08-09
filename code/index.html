@@ -1,52 +1,72 @@
 <!DOCTYPE html>
-<html lang="ru">
+<html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="description" content="Тренажёр для изучения греческого языка: склонения, роды и словарь.">
-  <title>Greek Trainer</title>
-  
-  <!-- Favicon (простой SVG) -->
+  <meta name="description" content="Ellenika — Greek language trainer.">
+  <title>Ellenika</title>
   <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🇬🇷</text></svg>">
-  
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <div class="container" role="main">
-    <header>
-      <h1>Greek Trainer</h1>
-      <p class="subtitle">Изучайте греческий с удовольствием</p>
-    </header>
+  <main class="app-shell">
+    <section id="home-screen" class="home-screen" aria-label="Choose language">
+      <div class="brand-line">YOUR SKILL · YOUR POWER</div>
 
-    <nav aria-label="Основная навигация">
-      <ul class="menu">
-        <li><button onclick="openDictionary()">Словарь</button></li>
-        <li><button onclick="openGenders()">Род</button></li>
-        <li><button onclick="openDeclension()">Склонения</button></li>
-      </ul>
-    </nav>
+      <button class="language-link english-link" onclick="showLanguageMessage('English B1')">
+        <span>ENGLISH</span>
+        <strong>B1</strong>
+      </button>
 
-    <!-- Контейнер для динамического контента -->
-    <section id="content" aria-live="polite">
-      <!-- По умолчанию показываем приветствие -->
-      <p>Выберите раздел в меню выше, чтобы начать тренировку.</p>
+      <button class="language-link greek-link" onclick="openGreekDashboard()">
+        <span>GREEK</span>
+        <strong>A1</strong>
+      </button>
+
+      <button class="choose-language" onclick="openGreekDashboard()">
+        <span>CHOOSE</span>
+        <span>LANGUAGE</span>
+      </button>
     </section>
 
-    <footer>
-      <small>© 2026 Greek Trainer</small>
-    </footer>
-  </div>
-<script>
-  loadWords(); // загружаем словарь при старте
-</script>
-  <!-- Подключаем скрипты (порядок важен) -->
-<script src="js/storage.js"></script>  
-<script src="js/core.js"></script>
-<script src="js/dictionary.js"></script>
-<script src="js/cards.js"></script>
-<script src="js/json.js"></script>
-<script src="js/navigation.js"></script>
-<script src="js/genders.js"></script>
-<script src="js/declension.js"></script>
+    <section id="dashboard-screen" class="dashboard-screen hidden" aria-label="Greek dashboard">
+      <button class="back-button" onclick="showHome()" aria-label="Back to language selection">←</button>
+      <div class="dashboard-content">
+        <div class="dashboard-title">GREEK</div>
+        <div class="stats-list">
+          <button class="stat-row" onclick="openDictionary()">
+            <span>VOCABULARY</span>
+            <strong id="vocabulary-progress">0/3500</strong>
+          </button>
+          <button class="stat-row" onclick="openGenders()">
+            <span>GENDERS</span>
+            <strong id="genders-progress">0%</strong>
+          </button>
+          <button class="stat-row" onclick="openDeclension()">
+            <span>DECLENSION</span>
+            <strong id="declension-progress">0%</strong>
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <section id="content-screen" class="content-screen hidden" aria-live="polite">
+      <button class="back-button content-back" onclick="openGreekDashboard()" aria-label="Back to Greek dashboard">←</button>
+      <div id="content"></div>
+    </section>
+  </main>
+
+  <script src="js/storage.js"></script>
+  <script src="js/core.js"></script>
+  <script src="js/dictionary.js"></script>
+  <script src="js/cards.js"></script>
+  <script src="js/json.js"></script>
+  <script src="js/navigation.js"></script>
+  <script src="js/genders.js"></script>
+  <script src="js/declension.js"></script>
+  <script>
+    loadWords();
+    updateDashboardStats();
+  </script>
 </body>
 </html>
