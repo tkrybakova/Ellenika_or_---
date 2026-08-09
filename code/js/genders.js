@@ -1,193 +1,67 @@
-// ============================================================
-// Модуль для тренировки родов (genders)
-// ============================================================
-
-// Состояние текущей игры
 let currentGame = null;
+let currentLevel = 'easy';
 
-// Фабрика создания игры (замыкание)
 function createGenderGame(task) {
-  // Приватные переменные
   const word = task;
   let answered = false;
 
-  // Методы проверки
+  function result(correct, message) {
+    answered = true;
+    let el = document.getElementById('gender-result');
+    if (!el) { el = document.createElement('div'); el.id = 'gender-result'; document.getElementById('content').appendChild(el); }
+    el.className = correct ? 'correct practice-result' : 'wrong practice-result';
+    el.textContent = (correct ? '✓ ' : '! ') + message;
+    showNext();
+  }
+
   function checkGender(selected) {
     if (answered) return;
-    answered = true;
     const correct = selected === word.gender;
-    showInlineResult(correct, `Род: ${selected} → ${correct ? '✅' : '❌'}`);
-    showNextButton();
+    result(correct, correct ? 'Correct gender.' : `Correct answer: ${capitalize(word.gender)}.`);
   }
 
   function checkArticle() {
     if (answered) return;
     const input = document.getElementById('genderAnswer');
     const answer = input.value.trim();
-    if (!answer) {
-      showInlineResult(false, 'Введите артикль');
-      return;
-    }
-    answered = true;
+    if (!answer) { result(false, 'Enter an article first.'); return; }
     const correct = answer === word.article;
-    showInlineResult(correct, `Артикль: ${answer} → ${correct ? '✅' : '❌'}`);
-    showNextButton();
+    result(correct, correct ? 'Correct article.' : `Correct article: ${word.article}.`);
   }
 
   function checkPlural() {
     if (answered) return;
-    const pluralInput = document.getElementById('pluralAnswer');
-    const articleInput = document.getElementById('pluralArticleAnswer');
-    const plural = pluralInput.value.trim();
-    const article = articleInput.value.trim();
-    if (!plural || !article) {
-      showInlineResult(false, 'Заполните оба поля');
-      return;
-    }
-    answered = true;
+    const plural = document.getElementById('pluralAnswer').value.trim();
+    const article = document.getElementById('pluralArticleAnswer').value.trim();
+    if (!plural || !article) { result(false, 'Complete both fields.'); return; }
     const correct = plural === word.plural && article === word.pluralArticle;
-    showInlineResult(correct, `Мн.число: ${plural} ${article} → ${correct ? '✅' : '❌'}`);
-    showNextButton();
+    result(correct, correct ? 'Correct plural.' : `Correct form: ${word.pluralArticle} ${word.plural}.`);
   }
 
-  function showInlineResult(correct, message) {
-    const container = document.getElementById('gender-result') || document.createElement('div');
-    container.id = 'gender-result';
-    container.className = correct ? 'correct' : 'wrong';
-    container.textContent = message;
-    // Вставляем после последнего элемента (поля или кнопки)
-    const content = document.getElementById('content');
-    // Если контейнера нет, добавляем в конец content
-    if (!document.getElementById('gender-result')) {
-      content.appendChild(container);
-    } else {
-      // Обновляем содержимое
-      container.textContent = message;
-      container.className = correct ? 'correct' : 'wrong';
-    }
+  function showNext() {
+    const old = document.getElementById('next-gender-btn'); if (old) old.remove();
+    const btn = document.createElement('button'); btn.id = 'next-gender-btn'; btn.className = 'next-action'; btn.textContent = 'Next word →';
+    btn.onclick = () => startGender(currentLevel); document.getElementById('content').appendChild(btn);
   }
 
-  function showNextButton() {
-    // Удаляем старую кнопку, если есть
-    const oldBtn = document.getElementById('next-gender-btn');
-    if (oldBtn) oldBtn.remove();
-
-    const btn = document.createElement('button');
-    btn.id = 'next-gender-btn';
-    btn.textContent = 'Следующее слово →';
-    btn.onclick = () => startGender(currentLevel);
-    const content = document.getElementById('content');
-    content.appendChild(btn);
-  }
-
-  // Рендеринг интерфейса
   function render(level) {
-    const levelTemplates = {
-      easy: () => `
-        <h2>${capitalize(level)}</h2>
-        <div class="word">${word.greek}</div>
-        <div>
-          <button onclick="currentGame.checkGender('masculine')">Masculine</button>
-          <button onclick="currentGame.checkGender('feminine')">Feminine</button>
-          <button onclick="currentGame.checkGender('neuter')">Neuter</button>
-        </div>
-      `,
-      medium: () => `
-        <h2>${capitalize(level)}</h2>
-        <div class="word">___ ${word.greek}</div>
-        <input id="genderAnswer" placeholder="Артикль" autofocus>
-        <button onclick="currentGame.checkArticle()">Проверить</button>
-      `,
-      hard: () => `
-        <h2>${capitalize(level)}</h2>
-        <div class="word">${word.article} ${word.greek}</div>
-        <p>Множественное число (слово):</p>
-        <input id="pluralAnswer" placeholder="мн.число">
-        <p>Множественное число (артикль):</p>
-        <input id="pluralArticleAnswer" placeholder="артикль мн.ч.">
-        <button onclick="currentGame.checkPlural()">Проверить</button>
-      `
+    const labels = {easy:['EASY','01 / 03'],medium:['MEDIUM','02 / 03'],hard:['HARD','03 / 03']};
+    const [name,number] = labels[level] || labels.easy;
+    const templates = {
+      easy: `<div class="exercise-shell"><div class="exercise-top"><span>GENDERS / ${name}</span><span>${number}</span></div><div class="progress-track"><i style="width:33%"></i></div><div class="prompt-label">WHAT IS THE GENDER?</div><div class="greek-word">${word.greek}</div><div class="word-hint">Choose one answer</div><div class="answer-grid three"><button class="answer-card" onclick="currentGame.checkGender('masculine')"><span>ὁ</span><strong>Masculine</strong></button><button class="answer-card" onclick="currentGame.checkGender('feminine')"><span>η</span><strong>Feminine</strong></button><button class="answer-card" onclick="currentGame.checkGender('neuter')"><span>το</span><strong>Neuter</strong></button></div></div>`,
+      medium: `<div class="exercise-shell"><div class="exercise-top"><span>GENDERS / ${name}</span><span>${number}</span></div><div class="progress-track"><i style="width:66%"></i></div><div class="prompt-label">COMPLETE THE ARTICLE</div><div class="word-line">___ <span>${word.greek}</span></div><div class="input-row"><input id="genderAnswer" placeholder="Type the article" autofocus><button class="check-action" onclick="currentGame.checkArticle()">Check</button></div><div class="word-hint">ο / η / το</div></div>`,
+      hard: `<div class="exercise-shell"><div class="exercise-top"><span>GENDERS / ${name}</span><span>${number}</span></div><div class="progress-track"><i style="width:100%"></i></div><div class="prompt-label">BUILD THE PLURAL</div><div class="greek-word small">${word.article} ${word.greek}</div><div class="hard-form"><label>Plural word<input id="pluralAnswer" placeholder="Plural"></label><label>Plural article<input id="pluralArticleAnswer" placeholder="Article"></label></div><button class="check-action full" onclick="currentGame.checkPlural()">Check answer</button></div>`
     };
-
-    const template = levelTemplates[level] || (() => '<p>Неизвестный уровень</p>');
-    const html = template();
-
-    // Вставляем в content
-    const content = document.getElementById('content');
-    content.innerHTML = html;
-
-    // Добавляем слушатели на Enter для полей ввода
-    const inputs = content.querySelectorAll('input');
-    inputs.forEach(input => {
-      input.addEventListener('keydown', (e) => {
-        if (e.key === 'Enter') {
-          // Находим кнопку "Проверить" в этом же блоке
-          const checkBtn = input.parentElement.querySelector('button[onclick*="check"]');
-          if (checkBtn) checkBtn.click();
-        }
-      });
-    });
-
-    // Сбрасываем состояние ответа
-    answered = false;
-    // Удаляем старый результат и кнопку "Next"
-    const oldResult = document.getElementById('gender-result');
-    if (oldResult) oldResult.remove();
-    const oldBtn = document.getElementById('next-gender-btn');
-    if (oldBtn) oldBtn.remove();
-
-    // Сохраняем текущий уровень для кнопки "Next"
-    currentLevel = level;
+    document.getElementById('content').innerHTML = templates[level] || templates.easy;
+    currentLevel = level; answered = false;
+    document.querySelectorAll('#content input').forEach(i => i.addEventListener('keydown', e => { if (e.key === 'Enter') document.querySelector('#content .check-action')?.click(); }));
   }
 
-  // Публичный API
-  return {
-    checkGender,
-    checkArticle,
-    checkPlural,
-    render,
-    word // на случай, если понадобится снаружи
-  };
+  return {checkGender,checkArticle,checkPlural,render,word};
 }
 
-// Глобальная переменная для хранения текущего уровня (для кнопки Next)
-let currentLevel = 'easy';
-
-// Стартовая функция (заменяет предыдущую startGender)
 function startGender(level) {
-  if (!dictionary || dictionary.length === 0) {
-    document.getElementById('content').innerHTML = '<p>Словарь пуст. Добавьте слова.</p>';
-    return;
-  }
-
-  // Выбираем случайное слово
-  const randomIndex = Math.floor(Math.random() * dictionary.length);
-  const task = dictionary[randomIndex];
-
-  // Создаём новую игру
-  currentGame = createGenderGame(task);
+  if (!dictionary || !dictionary.length) { document.getElementById('content').innerHTML = '<div class="empty-state"><h3>Your dictionary is empty</h3><p>Add words before starting practice.</p></div>'; return; }
+  currentGame = createGenderGame(dictionary[Math.floor(Math.random()*dictionary.length)]);
   currentGame.render(level);
 }
-
-
-
-// ============================================================
-// Обратная совместимость: старые функции checkGender, checkArticle, checkPlural
-// больше не нужны, но для безопасности можно оставить заглушки
-// ============================================================
-// (Удаляем или комментируем, чтобы не было конфликтов)
-// Для сохранения совместимости с другими скриптами, если они вызывают эти функции,
-// можно оставить их как обёртки:
-/*
-function checkGender(answer) {
-  if (currentGame) currentGame.checkGender(answer);
-}
-function checkArticle() {
-  if (currentGame) currentGame.checkArticle();
-}
-function checkPlural() {
-  if (currentGame) currentGame.checkPlural();
-}
-*/
-// Однако сейчас они переопределены в глобальной области, поэтому лучше их закомментировать
-// или удалить, чтобы не было путаницы.
