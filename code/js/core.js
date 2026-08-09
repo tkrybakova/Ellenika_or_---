@@ -1,5 +1,5 @@
 // ============================================================
-// core.js – общие утилиты и навигация интерфейса
+// core.js – common UI utilities and navigation
 // ============================================================
 
 const content = document.getElementById('content');
@@ -17,9 +17,7 @@ function showScreen(id) {
   });
 }
 
-function showHome() {
-  showScreen('home-screen');
-}
+function showHome() { showScreen('home-screen'); }
 
 function openGreekDashboard() {
   updateDashboardStats();
@@ -34,9 +32,6 @@ function updateDashboardStats() {
   const vocabulary = document.getElementById('vocabulary-progress');
   const genders = document.getElementById('genders-progress');
   const declension = document.getElementById('declension-progress');
-
-  // The dashboard starts with the values from the reference design.
-  // Vocabulary updates automatically when words are added.
   if (vocabulary) vocabulary.textContent = `${Math.min(dictionary.length || 0, 3500)}/3500`;
   if (genders) genders.textContent = '50%';
   if (declension) declension.textContent = '19%';
@@ -46,10 +41,11 @@ function renderPage(title, bodyHTML, extraClass = '') {
   clearGameState();
   showScreen('content-screen');
   content.innerHTML = `
-    <h2>${title}</h2>
-    <div class="page-content ${extraClass}">
-      ${bodyHTML}
+    <div class="page-heading">
+      <div class="page-eyebrow">ELLENIKA / GREEK</div>
+      <h2>${title}</h2>
     </div>
+    <div class="page-content ${extraClass}">${bodyHTML}</div>
   `;
 }
 
@@ -58,12 +54,34 @@ function capitalize(str) {
 }
 
 function renderLevelButtons(levels, startFn) {
-  return levels
-    .map(level => `<button onclick="${startFn}('${level}')">${capitalize(level)}</button>`)
-    .join('');
+  const descriptions = {
+    easy: ['EASY', 'Choose the correct answer', '01'],
+    medium: ['MEDIUM', 'Recall it without options', '02'],
+    hard: ['HARD', 'Complete the full form', '03']
+  };
+
+  return `
+    <div class="practice-intro">
+      <p>Choose a difficulty level</p>
+      <span>${levels.length} levels available</span>
+    </div>
+    <div class="level-grid">
+      ${levels.map(level => {
+        const item = descriptions[level] || [capitalize(level), 'Practice', ''];
+        return `
+          <button class="level-card level-${level}" onclick="${startFn}('${level}')">
+            <span class="level-number">${item[2]}</span>
+            <span class="level-name">${item[0]}</span>
+            <span class="level-description">${item[1]}</span>
+            <span class="level-arrow">→</span>
+          </button>
+        `;
+      }).join('')}
+    </div>
+  `;
 }
 
 function showResult(text) {
-  console.warn('showResult() устарела. Используйте встроенные сообщения в играх.');
-  content.innerHTML += `<h2>${text}</h2>`;
+  console.warn('showResult() is deprecated.');
+  content.innerHTML += `<div class="result-card">${text}</div>`;
 }
