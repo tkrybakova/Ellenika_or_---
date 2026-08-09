@@ -28,6 +28,12 @@ function openDictionary() {
         <div><div class="section-label">YOUR WORDS</div><h3>Vocabulary</h3></div>
         <span class="word-count">${dictionary.length}</span>
       </div>
+
+      <div class="dictionary-study-actions">
+        <button class="primary-action study-cards-button" onclick="openCards()">Study with cards <span>→</span></button>
+        <button class="secondary-action" onclick="openWriting()">Practice writing</button>
+      </div>
+
       <div id="word-list">${renderWordList()}</div>
     </section>
   `;
