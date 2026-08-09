@@ -11,6 +11,8 @@
 <body>
   <main class="app-shell">
     <section id="home-screen" class="home-screen" aria-label="Choose language">
+      <div class="home-glow home-glow-one"></div>
+      <div class="home-glow home-glow-two"></div>
       <div class="brand-line">YOUR SKILL · YOUR POWER</div>
 
       <button class="language-link english-link" onclick="showLanguageMessage('English B1')">
@@ -23,15 +25,18 @@
         <strong>A1</strong>
       </button>
 
-      <div class="choose-language" aria-label="Choose language">
+      <div class="choose-language" aria-hidden="true">
         <span>CHOOSE</span>
         <span>LANGUAGE</span>
       </div>
+
+      <div class="home-footer">ELLENIKA <span>•</span> GREEK LANGUAGE TRAINER</div>
     </section>
 
     <section id="dashboard-screen" class="dashboard-screen hidden" aria-label="Greek dashboard">
       <button class="back-button" onclick="showHome()" aria-label="Back to language selection">←</button>
       <div class="dashboard-content">
+        <div class="dashboard-kicker">LANGUAGE / A1</div>
         <div class="dashboard-title">GREEK</div>
         <div class="stats-list">
           <button class="stat-row" onclick="openDictionary()">
@@ -47,6 +52,7 @@
             <strong id="declension-progress">0%</strong>
           </button>
         </div>
+        <div class="dashboard-hint">Choose a section to continue</div>
       </div>
     </section>
 
