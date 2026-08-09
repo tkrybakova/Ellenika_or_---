@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Тренажёр для изучения греческого языка: склонения, роды и словарь.">
+  <title>Greek Trainer</title>
+  
+  <!-- Favicon (простой SVG) -->
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🇬🇷</text></svg>">
+  
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="container" role="main">
+    <header>
+      <h1>Greek Trainer</h1>
+      <p class="subtitle">Изучайте греческий с удовольствием</p>
+    </header>
+
+    <nav aria-label="Основная навигация">
+      <ul class="menu">
+        <li><button onclick="openDictionary()">Словарь</button></li>
+        <li><button onclick="openGenders()">Род</button></li>
+        <li><button onclick="openDeclension()">Склонения</button></li>
+      </ul>
+    </nav>
+
+    <!-- Контейнер для динамического контента -->
+    <section id="content" aria-live="polite">
+      <!-- По умолчанию показываем приветствие -->
+      <p>Выберите раздел в меню выше, чтобы начать тренировку.</p>
+    </section>
+
+    <footer>
+      <small>© 2026 Greek Trainer</small>
+    </footer>
+  </div>
+<script>
+  loadWords(); // загружаем словарь при старте
+</script>
+  <!-- Подключаем скрипты (порядок важен) -->
+<script src="js/storage.js"></script>  
+<script src="js/core.js"></script>
+<script src="js/dictionary.js"></script>
+<script src="js/cards.js"></script>
+<script src="js/json.js"></script>
+<script src="js/navigation.js"></script>
+<script src="js/genders.js"></script>
+<script src="js/declension.js"></script>
+</body>
+</html>
