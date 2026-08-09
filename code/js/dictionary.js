@@ -2,6 +2,8 @@
 // dictionary.js – vocabulary management
 // ============================================================
 
+let selectedVocabularyLevel = 'ALL';
+
 function openDictionary() {
   const formHTML = `
     <section class="dictionary-add">
@@ -12,6 +14,7 @@ function openDictionary() {
           <label class="field-main"><span>Greek</span><input id="greek" placeholder="βιβλίο" required></label>
           <label><span>English</span><input id="english" placeholder="book" required></label>
           <label><span>Russian</span><input id="russian" placeholder="книга" required></label>
+          <label><span>Level</span><select id="level">${VOCAB_LEVELS.map(level => `<option value="${level}" ${level === 'A1' ? 'selected' : ''}>${level}</option>`).join('')}</select></label>
           <button class="primary-action" type="submit" onclick="addNewWord()">Add</button>
         </div>
         <div class="form-row-details">
@@ -29,9 +32,14 @@ function openDictionary() {
         <span class="word-count">${dictionary.length}</span>
       </div>
 
+      <div class="vocabulary-levels">
+        <button class="level-filter ${selectedVocabularyLevel === 'ALL' ? 'active' : ''}" onclick="filterVocabulary('ALL')">ALL</button>
+        ${VOCAB_LEVELS.map(level => `<button class="level-filter ${selectedVocabularyLevel === level ? 'active' : ''}" onclick="filterVocabulary('${level}')">${level}<small>${dictionary.filter(w => (w.level || 'A1') === level).length}</small></button>`).join('')}
+      </div>
+
       <div class="dictionary-study-actions">
-        <button class="primary-action study-cards-button" onclick="openCards()">Study with cards <span>→</span></button>
-        <button class="secondary-action" onclick="openWriting()">Practice writing</button>
+        <button class="primary-action study-cards-button" onclick="openCards(selectedVocabularyLevel)">Study with cards <span>→</span></button>
+        <button class="secondary-action" onclick="openWriting(selectedVocabularyLevel)">Practice writing</button>
       </div>
 
       <div id="word-list">${renderWordList()}</div>
@@ -49,24 +57,43 @@ function openDictionary() {
   });
 }
 
+function filterVocabulary(level) {
+  selectedVocabularyLevel = level;
+  const list = document.getElementById('word-list');
+  if (list) list.innerHTML = renderWordList();
+  document.querySelectorAll('.level-filter').forEach(button => button.classList.remove('active'));
+  const active = [...document.querySelectorAll('.level-filter')].find(button => button.textContent.trim().startsWith(level));
+  if (active) active.classList.add('active');
+}
+
+function getWordsForLevel(level = 'ALL') {
+  return level === 'ALL' ? dictionary : dictionary.filter(word => (word.level || 'A1') === level);
+}
+
 function renderWordList() {
-  if (!dictionary || dictionary.length === 0) {
-    return `<div class="empty-state compact"><div class="empty-icon">α</div><h3>Your vocabulary is empty</h3><p>Add your first Greek word above.</p></div>`;
+  const words = getWordsForLevel(selectedVocabularyLevel);
+  if (!words.length) {
+    return `<div class="empty-state compact"><div class="empty-icon">α</div><h3>No words at this level</h3><p>Add words or choose another level.</p></div>`;
   }
 
-  return dictionary.map((w, index) => `
-    <div class="dictionary-entry">
-      <div class="entry-main">
-        <span class="entry-greek">${w.article || ''} ${w.greek || ''}</span>
-        <span class="entry-translation">${w.russian || ''} · ${w.english || ''}</span>
+  return words.map(w => {
+    const index = dictionary.indexOf(w);
+    const level = w.level || 'A1';
+    return `
+      <div class="dictionary-entry">
+        <div class="entry-main">
+          <span class="entry-greek">${w.article || ''} ${w.greek || ''}</span>
+          <span class="entry-translation">${w.russian || ''} · ${w.english || ''}</span>
+        </div>
+        <div class="entry-meta">
+          <span class="level-pill level-${level.toLowerCase()}">${level}</span>
+          <span class="gender-pill gender-${w.gender || 'neuter'}">${capitalize(w.gender || '')}</span>
+          <span>${w.pluralArticle || ''} ${w.plural || ''}</span>
+        </div>
+        <button class="delete-btn" onclick="deleteWord(${index})" title="Delete word" aria-label="Delete word">×</button>
       </div>
-      <div class="entry-meta">
-        <span class="gender-pill gender-${w.gender || 'neuter'}">${capitalize(w.gender || '')}</span>
-        <span>${w.pluralArticle || ''} ${w.plural || ''}</span>
-      </div>
-      <button class="delete-btn" onclick="deleteWord(${index})" title="Delete word" aria-label="Delete word">×</button>
-    </div>
-  `).join('');
+    `;
+  }).join('');
 }
 
 function addNewWord() {
@@ -80,15 +107,16 @@ function addNewWord() {
     }
   }
 
-  dictionary.push({
-    greek: document.getElementById('greek').value.trim(),
-    english: document.getElementById('english').value.trim(),
-    russian: document.getElementById('russian').value.trim(),
-    article: document.getElementById('article').value.trim(),
-    plural: document.getElementById('plural').value.trim(),
-    pluralArticle: document.getElementById('pluralArticle').value.trim(),
-    gender: document.getElementById('gender').value
-  });
+  dictionary.push(normalizeWord({
+    greek: document.getElementById('greek').value,
+    english: document.getElementById('english').value,
+    russian: document.getElementById('russian').value,
+    article: document.getElementById('article').value,
+    plural: document.getElementById('plural').value,
+    pluralArticle: document.getElementById('pluralArticle').value,
+    gender: document.getElementById('gender').value,
+    level: document.getElementById('level').value
+  }));
 
   saveWords();
   openDictionary();
