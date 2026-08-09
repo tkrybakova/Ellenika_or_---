@@ -1,19 +1,30 @@
 // ============================================================
-// navigation.js – открытие игровых разделов
+// navigation.js – opening learning sections
 // ============================================================
 
 function openGenders() {
   if (!dictionary || dictionary.length === 0) {
-    renderPage('Роды', '<p class="text-light">Сначала добавьте слова в словарь.</p>');
+    renderPage('GENDERS', emptyState('Your dictionary is empty', 'Add a few Greek words first.'));
     return;
   }
-  renderPage('Роды', renderLevelButtons(['easy', 'medium', 'hard'], 'startGender'));
+  renderPage('GENDERS', renderLevelButtons(['easy', 'medium', 'hard'], 'startGender'), 'practice-page');
 }
 
 function openDeclension() {
   if (!dictionary || dictionary.length === 0) {
-    renderPage('Склонения', '<p class="text-light">Сначала добавьте слова в словарь.</p>');
+    renderPage('DECLENSION', emptyState('Your dictionary is empty', 'Add a few Greek words first.'));
     return;
   }
-  renderPage('Склонения', renderLevelButtons(['easy', 'medium', 'hard'], 'startDeclension'));
+  renderPage('DECLENSION', renderLevelButtons(['easy', 'medium', 'hard'], 'startDeclension'), 'practice-page');
+}
+
+function emptyState(title, text) {
+  return `
+    <div class="empty-state">
+      <div class="empty-icon">+</div>
+      <h3>${title}</h3>
+      <p>${text}</p>
+      <button class="secondary-action" onclick="openDictionary()">Open vocabulary</button>
+    </div>
+  `;
 }
