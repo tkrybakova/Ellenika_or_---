@@ -5,15 +5,20 @@
 let cardIndex = 0;
 let cardFlipped = false;
 let cardOrder = [];
+let activeCardLevel = 'ALL';
 
-// --- Общие функции для навигации по карточкам ---
+function getCardPool() {
+  return getWordsForLevel(activeCardLevel);
+}
 
 function getCurrentCard() {
-  return dictionary[cardOrder[cardIndex]];
+  const pool = getCardPool();
+  return pool[cardOrder[cardIndex]];
 }
 
 function shuffleCards() {
-  cardOrder = Array.from({ length: dictionary.length }, (_, i) => i);
+  const pool = getCardPool();
+  cardOrder = Array.from({ length: pool.length }, (_, i) => i);
   for (let i = cardOrder.length - 1; i > 0; i--) {
     const j = Math.floor(Math.random() * (i + 1));
     [cardOrder[i], cardOrder[j]] = [cardOrder[j], cardOrder[i]];
@@ -22,14 +27,12 @@ function shuffleCards() {
 }
 
 function nextCard() {
-  if (cardIndex < dictionary.length - 1) {
+  const pool = getCardPool();
+  if (cardIndex < pool.length - 1) {
     cardIndex++;
-    // вызываем обновление текущего режима (либо showCard, либо renderWriting)
     if (document.querySelector('.card')) showCard();
     else if (document.querySelector('.writing-container')) renderWriting();
-  } else {
-    alert('Это последняя карточка!');
-  }
+  } else alert('Это последняя карточка!');
 }
 
 function prevCard() {
@@ -37,39 +40,42 @@ function prevCard() {
     cardIndex--;
     if (document.querySelector('.card')) showCard();
     else if (document.querySelector('.writing-container')) renderWriting();
-  } else {
-    alert('Это первая карточка!');
-  }
+  } else alert('Это первая карточка!');
 }
 
-// --- Флип-карточки ---
-
-function openCards() {
-  if (!dictionary || dictionary.length === 0) {
-    alert('Словарь пуст. Добавьте слова сначала.');
+function openCards(level = 'ALL') {
+  activeCardLevel = level || 'ALL';
+  const pool = getCardPool();
+  if (!pool.length) {
+    alert(`На уровне ${activeCardLevel} пока нет слов.`);
     return;
   }
   shuffleCards();
+  const current = getCurrentCard();
+  const levelTitle = activeCardLevel === 'ALL' ? 'ALL LEVELS' : activeCardLevel;
   const html = `
     <div class="cards-container">
+      <div class="cards-level-label">VOCABULARY / ${levelTitle}</div>
       <div class="card" onclick="flipCard()">
         <div class="card-inner">
           <div class="card-front">
-            <div class="card-word">${getCurrentCard().greek}</div>
-            <div class="card-article">${getCurrentCard().article || ''}</div>
+            <div class="card-level">${current.level || 'A1'}</div>
+            <div class="card-word">${current.greek}</div>
+            <div class="card-article">${current.article || ''}</div>
           </div>
           <div class="card-back">
-            <div class="card-translation">${getCurrentCard().russian}</div>
-            <div class="card-english">${getCurrentCard().english}</div>
+            <div class="card-level">${current.level || 'A1'}</div>
+            <div class="card-translation">${current.russian}</div>
+            <div class="card-english">${current.english || ''}</div>
           </div>
         </div>
       </div>
       <div class="card-controls">
         <button onclick="prevCard()">◀ Предыдущее</button>
-        <span class="card-counter">${cardIndex + 1} / ${dictionary.length}</span>
+        <span class="card-counter">${cardIndex + 1} / ${pool.length}</span>
         <button onclick="nextCard()">Следующее ▶</button>
-        <button onclick="shuffleCards(); showCard();" style="background:#8b5cf6;">🔀 Перемешать</button>
-        <button onclick="openDictionary()" style="background:#6b7280;">⬅ Назад к словарю</button>
+        <button onclick="shuffleCards(); showCard();">🔀 Перемешать</button>
+        <button onclick="openDictionary()">← Словарь</button>
       </div>
     </div>
   `;
@@ -82,20 +88,23 @@ function showCard() {
   const cardInner = document.querySelector('.card-inner');
   if (cardInner) cardInner.style.transform = 'rotateY(0deg)';
 
+  const current = getCurrentCard();
+  if (!current) return;
   const frontWord = document.querySelector('.card-front .card-word');
   const frontArticle = document.querySelector('.card-front .card-article');
+  const frontLevel = document.querySelector('.card-front .card-level');
   const backTranslation = document.querySelector('.card-back .card-translation');
   const backEnglish = document.querySelector('.card-back .card-english');
+  const backLevel = document.querySelector('.card-back .card-level');
   const counter = document.querySelector('.card-counter');
 
-  if (frontWord && backTranslation) {
-    const current = getCurrentCard();
-    frontWord.textContent = current.greek;
-    frontArticle.textContent = current.article || '';
-    backTranslation.textContent = current.russian;
-    backEnglish.textContent = current.english || '';
-    if (counter) counter.textContent = `${cardIndex + 1} / ${dictionary.length}`;
-  }
+  if (frontWord) frontWord.textContent = current.greek;
+  if (frontArticle) frontArticle.textContent = current.article || '';
+  if (frontLevel) frontLevel.textContent = current.level || 'A1';
+  if (backTranslation) backTranslation.textContent = current.russian;
+  if (backEnglish) backEnglish.textContent = current.english || '';
+  if (backLevel) backLevel.textContent = current.level || 'A1';
+  if (counter) counter.textContent = `${cardIndex + 1} / ${getCardPool().length}`;
 }
 
 function flipCard() {
@@ -105,11 +114,11 @@ function flipCard() {
   cardInner.style.transform = cardFlipped ? 'rotateY(180deg)' : 'rotateY(0deg)';
 }
 
-// --- Режим написания (показываем перевод – пользователь пишет греческое слово) ---
-
-function openWriting() {
-  if (!dictionary || dictionary.length === 0) {
-    alert('Словарь пуст. Добавьте слова сначала.');
+function openWriting(level = 'ALL') {
+  activeCardLevel = level || 'ALL';
+  const pool = getCardPool();
+  if (!pool.length) {
+    alert(`На уровне ${activeCardLevel} пока нет слов.`);
     return;
   }
   shuffleCards();
@@ -118,8 +127,10 @@ function openWriting() {
 
 function renderWriting() {
   const current = getCurrentCard();
+  const pool = getCardPool();
   const html = `
     <div class="writing-container">
+      <div class="cards-level-label">VOCABULARY / ${activeCardLevel === 'ALL' ? 'ALL LEVELS' : activeCardLevel}</div>
       <div class="writing-prompt">
         <p>Переведите на греческий:</p>
         <div class="writing-translation">${current.russian}</div>
@@ -132,16 +143,14 @@ function renderWriting() {
       <div id="writing-result"></div>
       <div class="card-controls">
         <button onclick="prevCard(); renderWriting();">◀ Предыдущее</button>
-        <span class="card-counter">${cardIndex + 1} / ${dictionary.length}</span>
+        <span class="card-counter">${cardIndex + 1} / ${pool.length}</span>
         <button onclick="nextCard(); renderWriting();">Следующее ▶</button>
-        <button onclick="shuffleCards(); renderWriting();" style="background:#8b5cf6;">🔀 Перемешать</button>
-        <button onclick="openDictionary()" style="background:#6b7280;">⬅ Назад к словарю</button>
+        <button onclick="shuffleCards(); renderWriting();">🔀 Перемешать</button>
+        <button onclick="openDictionary()">← Словарь</button>
       </div>
     </div>
   `;
   renderPage('Написание', html);
-  const resultDiv = document.getElementById('writing-result');
-  if (resultDiv) resultDiv.innerHTML = '';
   const input = document.getElementById('writing-input');
   if (input) input.focus();
 }
@@ -150,16 +159,12 @@ function checkWriting() {
   const input = document.getElementById('writing-input');
   if (!input) return;
   const answer = input.value.trim();
-  if (!answer) {
-    alert('Введите слово');
-    return;
-  }
+  if (!answer) return;
   const current = getCurrentCard();
   const correct = current.greek.toLowerCase().trim() === answer.toLowerCase().trim();
   const resultDiv = document.getElementById('writing-result');
   if (resultDiv) {
     resultDiv.className = correct ? 'correct' : 'wrong';
-    resultDiv.textContent = correct ? '✅ Правильно!' : `❌ Неправильно. Правильно: ${current.greek}`;
+    resultDiv.textContent = correct ? '✓ Правильно!' : `✕ Неправильно. Правильно: ${current.greek}`;
   }
-  // Можно автоматически переходить к следующему, но оставим ручной переход.
 }
