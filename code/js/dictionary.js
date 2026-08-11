@@ -1,14 +1,44 @@
 // ============================================================
-// dictionary.js – vocabulary management
+// dictionary.js – группы слов и прогресс запоминания
 // ============================================================
 
 let selectedVocabularyLevel = 'ALL';
+let selectedVocabularyGroup = null;
+
+function getWordGroups(word) {
+  return Array.isArray(word.groups) ? word.groups : [];
+}
+
+function getVocabularyGroups(level = 'ALL') {
+  const words = getWordsForLevel(level);
+  const map = new Map();
+  words.forEach(word => {
+    const groups = getWordGroups(word);
+    (groups.length ? groups : ['Без группы']).forEach(group => {
+      if (!map.has(group)) map.set(group, []);
+      map.get(group).push(word);
+    });
+  });
+  return [...map.entries()].sort((a, b) => a[0].localeCompare(b[0], 'ru'));
+}
+
+function getGroupProgress(words) {
+  if (!words.length) return 0;
+  const total = words.reduce((sum, word) => sum + getWordProgress(word), 0);
+  return Math.round((total / (words.length * 3)) * 100);
+}
+
+function getProgressDots(percent) {
+  const filled = Math.round(percent / 25);
+  return Array.from({ length: 4 }, (_, i) => `<span class="memory-dot ${i < filled ? 'filled' : ''}"></span>`).join('');
+}
 
 function openDictionary() {
+  selectedVocabularyGroup = null;
   const html = `
     <section class="word-library">
       <div class="library-heading">
-        <div><div class="section-label">YOUR WORDS</div><h3>Vocabulary</h3></div>
+        <div><div class="section-label">VOCABULARY</div><h3>Groups</h3><p class="library-subtitle">Выберите тему, чтобы продолжить изучение.</p></div>
         <span class="word-count">${dictionary.length}</span>
       </div>
       <div class="dictionary-import-row">
@@ -19,19 +49,16 @@ function openDictionary() {
         <button class="level-filter ${selectedVocabularyLevel === 'ALL' ? 'active' : ''}" onclick="filterVocabulary('ALL')">ALL<small>${dictionary.length}</small></button>
         ${VOCAB_LEVELS.map(level => `<button class="level-filter ${selectedVocabularyLevel === level ? 'active' : ''}" onclick="filterVocabulary('${level}')">${level}<small>${dictionary.filter(w => (w.level || 'A1') === level).length}</small></button>`).join('')}
       </div>
-      <div class="dictionary-study-actions">
-        <button class="primary-action study-cards-button" onclick="openCards(selectedVocabularyLevel)">Study with cards <span>→</span></button>
-        <button class="secondary-action" onclick="openWriting(selectedVocabularyLevel)">Practice writing</button>
-      </div>
-      <div id="word-list">${renderWordList()}</div>
+      <div id="group-list" class="vocabulary-groups">${renderGroupList()}</div>
     </section>`;
   renderPage('VOCABULARY', html, 'dictionary-page');
 }
 
 function filterVocabulary(level) {
   selectedVocabularyLevel = level;
-  const list = document.getElementById('word-list');
-  if (list) list.innerHTML = renderWordList();
+  selectedVocabularyGroup = null;
+  const list = document.getElementById('group-list');
+  if (list) list.innerHTML = renderGroupList();
   document.querySelectorAll('.level-filter').forEach(button => button.classList.remove('active'));
   const active = [...document.querySelectorAll('.level-filter')].find(button => button.textContent.trim().startsWith(level));
   if (active) active.classList.add('active');
@@ -41,22 +68,43 @@ function getWordsForLevel(level = 'ALL') {
   return level === 'ALL' ? dictionary : dictionary.filter(word => (word.level || 'A1') === level);
 }
 
-function renderWordList() {
-  const words = getWordsForLevel(selectedVocabularyLevel);
-  if (!words.length) return `<div class="empty-state compact"><div class="empty-icon">α</div><h3>No words at this level</h3><p>Load a JSON dictionary to add words.</p></div>`;
-  return words.map(w => {
-    const index = dictionary.indexOf(w);
-    const level = w.level || 'A1';
-    return `<div class="dictionary-entry">
-      <div class="entry-main">
-        <span class="entry-greek">${w.article || ''} ${w.greek || ''}</span>
-        <span class="entry-translation">${w.russian || ''} · ${w.english || ''}</span>
-        <span class="entry-group">${w.group || 'General'}</span>
-      </div>
-      <div class="entry-meta"><span class="level-pill level-${level.toLowerCase()}">${level}</span><span class="gender-pill gender-${w.gender || 'neuter'}">${capitalize(w.gender || '')}</span><span>${w.pluralArticle || ''} ${w.plural || ''}</span></div>
-      <button class="delete-btn" onclick="deleteWord(${index})" title="Delete word" aria-label="Delete word">×</button>
-    </div>`;
+function renderGroupList() {
+  const groups = getVocabularyGroups(selectedVocabularyLevel);
+  if (!groups.length) return `<div class="empty-state compact"><div class="empty-icon">α</div><h3>Нет слов</h3><p>Загрузите новый JSON-словарь.</p></div>`;
+  return groups.map(([group, words], index) => {
+    const progress = getGroupProgress(words);
+    const levels = [...new Set(words.map(w => w.level || 'A1'))].join(' · ');
+    return `<button class="vocabulary-group-card" onclick="openVocabularyGroup(${JSON.stringify(group)})">
+      <div class="group-card-top"><span class="group-number">${String(index + 1).padStart(2, '0')}</span><span class="group-levels">${levels}</span></div>
+      <div class="group-card-title">${escapeHtml(group)}</div>
+      <div class="group-card-bottom"><span>${words.length} ${words.length === 1 ? 'слово' : 'слов'}</span><span class="memory-progress">${getProgressDots(progress)} <b>${progress}%</b></span></div>
+      <div class="group-progress-bar"><span style="width:${progress}%"></span></div>
+    </button>`;
   }).join('');
+}
+
+function openVocabularyGroup(group) {
+  selectedVocabularyGroup = group;
+  const words = getVocabularyGroups(selectedVocabularyLevel).find(([name]) => name === group)?.[1] || [];
+  if (!words.length) return;
+  const progress = getGroupProgress(words);
+  const html = `<section class="group-study-page">
+    <div class="group-study-header">
+      <button class="secondary-action" onclick="openDictionary()">← Группы</button>
+      <div><div class="section-label">VOCABULARY / ${selectedVocabularyLevel}</div><h3>${escapeHtml(group)}</h3></div>
+      <div class="group-big-progress"><strong>${progress}%</strong><span>запомнено</span></div>
+    </div>
+    <div class="group-study-actions">
+      <button class="primary-action study-cards-button" onclick="openCardsForGroup(${JSON.stringify(group)})">Study with cards <span>→</span></button>
+      <button class="secondary-action" onclick="openWritingForGroup(${JSON.stringify(group)})">Practice writing</button>
+    </div>
+    <div class="group-word-summary">${words.map(word => `<div class="word-progress-row"><span class="word-progress-name">${escapeHtml(word.greek)}</span><span class="word-progress-level">${escapeHtml(word.level || 'A1')}</span><span class="word-progress-dots">${getProgressDots(getWordProgress(word) * 33.333)}</span></div>`).join('')}</div>
+  </section>`;
+  renderPage('GROUP', html, 'dictionary-page');
+}
+
+function escapeHtml(value) {
+  return String(value ?? '').replace(/[&<>'"]/g, char => ({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[char]));
 }
 
 function deleteWord(index) {
