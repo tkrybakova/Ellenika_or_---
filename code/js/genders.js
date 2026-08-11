@@ -49,15 +49,15 @@ function createGenderGame(task) {
     const [name,number] = labels[level] || labels.easy;
     const translation = `<div class="word-translation">${word.russian || ''}${word.english ? ` · ${word.english}` : ''}</div>`;
     const genderHint = `
-      <div class="gender-hint">
-        <div class="gender-hint-title">Quick hint · noun gender</div>
-        <div class="gender-hint-table">
-          <div class="gender-hint-row gender-hint-head">
+      <div class="gender-hint" style="margin-top:24px;padding:18px 20px;background:rgba(255,255,255,.72);border:1px solid #dce5ea;border-radius:16px;text-align:left;box-shadow:0 6px 18px rgba(45,64,74,.05);">
+        <div class="gender-hint-title" style="margin-bottom:12px;color:#52636d;font-size:11px;font-weight:800;letter-spacing:.14em;text-transform:uppercase;">Quick hint · noun gender</div>
+        <div class="gender-hint-table" style="overflow:hidden;border:1px solid #e1e8ec;border-radius:12px;background:#fff;">
+          <div class="gender-hint-row gender-hint-head" style="display:grid;grid-template-columns:1.05fr .7fr 2fr;gap:12px;padding:9px 11px;background:#f3f7f9;color:#87959d;font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:.08em;">
             <span>Gender</span><span>Article</span><span>Common endings</span>
           </div>
-          <div class="gender-hint-row">
-            <span><a href="https://www.ilearngreek.com/lessons/sounds/genders/1.mp3" target="_blank" rel="noopener">Αρσενικά</a><small>Masculine</small></span>
-            <span><a href="https://www.ilearngreek.com/lessons/sounds/genders/o.mp3" target="_blank" rel="noopener">ο</a></span>
+          <div class="gender-hint-row" style="display:grid;grid-template-columns:1.05fr .7fr 2fr;gap:12px;padding:11px;border-top:1px solid #edf1f3;align-items:center;color:#354650;font-size:12px;">
+            <span><a href="https://www.ilearngreek.com/lessons/sounds/genders/1.mp3" target="_blank" rel="noopener" style="color:#2299e9;font-weight:700;text-decoration:none;">Αρσενικά</a><small style="display:block;margin-top:2px;color:#99a5ac;font-size:10px;">Masculine</small></span>
+            <span><a href="https://www.ilearngreek.com/lessons/sounds/genders/o.mp3" target="_blank" rel="noopener" style="color:#354650;font-weight:800;text-decoration:none;">ο</a></span>
             <span>
               <a href="https://www.ilearngreek.com/lessons/sounds/genders/os.mp3" target="_blank" rel="noopener">-ος</a>,
               <a href="https://www.ilearngreek.com/lessons/sounds/genders/as.mp3" target="_blank" rel="noopener">-ας</a>,
@@ -66,9 +66,9 @@ function createGenderGame(task) {
               <a href="https://www.ilearngreek.com/lessons/sounds/genders/es.mp3" target="_blank" rel="noopener">-ες</a>
             </span>
           </div>
-          <div class="gender-hint-row">
-            <span><a href="https://www.ilearngreek.com/lessons/sounds/genders/2.mp3" target="_blank" rel="noopener">Θηλυκά</a><small>Feminine</small></span>
-            <span><a href="https://www.ilearngreek.com/lessons/sounds/genders/i.mp3" target="_blank" rel="noopener">η</a></span>
+          <div class="gender-hint-row" style="display:grid;grid-template-columns:1.05fr .7fr 2fr;gap:12px;padding:11px;border-top:1px solid #edf1f3;align-items:center;color:#354650;font-size:12px;">
+            <span><a href="https://www.ilearngreek.com/lessons/sounds/genders/2.mp3" target="_blank" rel="noopener" style="color:#2299e9;font-weight:700;text-decoration:none;">Θηλυκά</a><small style="display:block;margin-top:2px;color:#99a5ac;font-size:10px;">Feminine</small></span>
+            <span><a href="https://www.ilearngreek.com/lessons/sounds/genders/i.mp3" target="_blank" rel="noopener" style="color:#354650;font-weight:800;text-decoration:none;">η</a></span>
             <span>
               <a href="https://www.ilearngreek.com/lessons/sounds/genders/os.mp3" target="_blank" rel="noopener">-ος</a>,
               <a href="https://www.ilearngreek.com/lessons/sounds/genders/iIta.mp3" target="_blank" rel="noopener">-η</a>,
@@ -77,9 +77,9 @@ function createGenderGame(task) {
               <a href="https://www.ilearngreek.com/lessons/sounds/genders/ou.mp3" target="_blank" rel="noopener">-ου</a>
             </span>
           </div>
-          <div class="gender-hint-row">
-            <span><a href="https://www.ilearngreek.com/lessons/sounds/genders/3.mp3" target="_blank" rel="noopener">Ουδέτερα</a><small>Neuter</small></span>
-            <span><a href="https://www.ilearngreek.com/lessons/sounds/genders/to.mp3" target="_blank" rel="noopener">το</a></span>
+          <div class="gender-hint-row" style="display:grid;grid-template-columns:1.05fr .7fr 2fr;gap:12px;padding:11px;border-top:1px solid #edf1f3;align-items:center;color:#354650;font-size:12px;">
+            <span><a href="https://www.ilearngreek.com/lessons/sounds/genders/3.mp3" target="_blank" rel="noopener" style="color:#2299e9;font-weight:700;text-decoration:none;">Ουδέτερα</a><small style="display:block;margin-top:2px;color:#99a5ac;font-size:10px;">Neuter</small></span>
+            <span><a href="https://www.ilearngreek.com/lessons/sounds/genders/to.mp3" target="_blank" rel="noopener" style="color:#354650;font-weight:800;text-decoration:none;">το</a></span>
             <span>
               <a href="https://www.ilearngreek.com/lessons/sounds/genders/os.mp3" target="_blank" rel="noopener">-ος</a>,
               <a href="https://www.ilearngreek.com/lessons/sounds/genders/iGIOTA.mp3" target="_blank" rel="noopener">-ι</a>,
@@ -90,7 +90,7 @@ function createGenderGame(task) {
             </span>
           </div>
         </div>
-        <div class="gender-hint-note">These are common patterns, not absolute rules.</div>
+        <div class="gender-hint-note" style="margin-top:9px;color:#94a0a7;font-size:10px;">These are common patterns, not absolute rules. Click a Greek form to hear it.</div>
       </div>`;
     const templates = {
       easy: `<div class="exercise-shell"><div class="exercise-top"><span>GENDERS / ${name}</span><span>${number}</span></div><div class="progress-track"><i style="width:33%"></i></div><div class="prompt-label">WHAT IS THE GENDER?</div><div class="greek-word">${word.greek}</div>${translation}<div class="word-hint">Choose one answer</div><div class="answer-grid three"><button class="answer-card" onclick="currentGame.checkGender('masculine')"><span>ὁ</span><strong>Masculine</strong></button><button class="answer-card" onclick="currentGame.checkGender('feminine')"><span>η</span><strong>Feminine</strong></button><button class="answer-card" onclick="currentGame.checkGender('neuter')"><span>το</span><strong>Neuter</strong></button></div>${genderHint}</div>`,
