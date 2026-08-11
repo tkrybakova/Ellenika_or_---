@@ -8,6 +8,16 @@ let cardOrder = [];
 let activeCardLevel = null;
 let activeCardGroup = null;
 
+function speakGreek(text) {
+  if (!text || !('speechSynthesis' in window)) return;
+  window.speechSynthesis.cancel();
+  const utterance = new SpeechSynthesisUtterance(String(text));
+  utterance.lang = 'el-GR';
+  utterance.rate = 0.85;
+  utterance.pitch = 1;
+  window.speechSynthesis.speak(utterance);
+}
+
 function getCardPool() {
   let pool = activeCardLevel ? getWordsForLevel(activeCardLevel) : [];
   if (activeCardGroup) pool = pool.filter(word => getWordGroup(word) === activeCardGroup);
@@ -36,7 +46,6 @@ function openCards(level) {
 }
 
 function openCardsForGroup(group, level) {
-  // Группа всегда принадлежит конкретному уровню.
   activeCardLevel = level || selectedVocabularyLevel;
   activeCardGroup = group;
   openCardsView();
@@ -58,6 +67,7 @@ function showCardPage() {
   if (!current) return;
 
   const title = `${activeCardLevel}${activeCardGroup ? ' / ' + activeCardGroup : ''}`;
+  const speechButton = `<button type="button" class="speak-word-button" onclick="speakGreek('${escapeJs(current.greek)}');event.stopPropagation()" aria-label="Listen to Greek pronunciation" title="Прослушать произношение">🔊</button>`;
 
   const html = `
     <div class="cards-container">
@@ -65,7 +75,7 @@ function showCardPage() {
       <div class="card" onclick="flipCard()"><div class="card-inner">
         <div class="card-front">
           <div class="card-level">${escapeHtml(String(current.level || '').toUpperCase())}</div>
-          <div class="card-word">${escapeHtml(current.greek)}</div>
+          <div class="card-word-row"><div class="card-word">${escapeHtml(current.greek)}</div>${speechButton}</div>
           <div class="card-article">${escapeHtml(current.article || '')}</div>
         </div>
         <div class="card-back">
@@ -155,6 +165,7 @@ function renderWriting() {
   if (!current) return;
 
   const title = `${activeCardLevel}${activeCardGroup ? ' / ' + activeCardGroup : ''}`;
+  const speechButton = `<button type="button" class="speak-word-button writing-speak-button" onclick="speakGreek('${escapeJs(current.greek)}')" aria-label="Listen to Greek pronunciation" title="Прослушать произношение">🔊</button>`;
 
   const html = `
     <div class="writing-container">
@@ -170,6 +181,7 @@ function renderWriting() {
         <button onclick="checkWriting()">Проверить</button>
       </div>
       <div id="writing-result"></div>
+      <div class="writing-answer-audio" id="writing-answer-audio">${speechButton}</div>
       <div class="card-controls">
         <button onclick="prevCard();renderWriting()">◀ Предыдущее</button>
         <span class="card-counter">${cardIndex + 1} / ${pool.length}</span>
@@ -199,6 +211,10 @@ function checkWriting() {
     result.textContent = correct ? '✓ Правильно!' : `✕ Неправильно. Правильно: ${current.greek}`;
   }
   updateWordMemory(current, correct ? 3 : 1);
+}
+
+function escapeJs(value) {
+  return String(value ?? '').replace(/\\/g, '\\\\').replace(/'/g, "\\'").replace(/\r?\n/g, ' ');
 }
 
 function returnFromStudy() {
