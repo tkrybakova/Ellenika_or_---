@@ -35,8 +35,16 @@
       <button class="back-button content-back" onclick="openGreekDashboard()" aria-label="Back to Greek dashboard">←</button>
       <div id="content"></div>
     </section>
+    <aside id="study-tools" class="study-tools" aria-label="Study timer and score">
+      <div class="study-tool timer-tool">
+        <span class="tool-label">FOCUS</span>
+        <strong id="study-timer-display">30:00</strong>
+        <div class="timer-actions"><button id="study-timer-toggle" onclick="toggleStudyTimer()">Start</button><button onclick="resetStudyTimer()" aria-label="Reset timer">↻</button></div>
+      </div>
+      <div class="study-tool score-tool"><span class="tool-label">SCORE</span><strong id="study-score">0 pts</strong></div>
+    </aside>
   </main>
-  <script src="js/storage.js"></script><script src="js/core.js"></script><script src="js/dictionary.js"></script><script src="js/cards.js"></script><script src="js/json.js"></script><script src="js/navigation.js"></script><script src="js/genders.js"></script><script src="js/declension.js"></script>
-  <script>loadWords(); updateDashboardStats();</script>
+  <script src="js/storage.js"></script><script src="js/core.js"></script><script src="js/dictionary.js"></script><script src="js/cards.js"></script><script src="js/json.js"></script><script src="js/navigation.js"></script><script src="js/genders.js"></script><script src="js/declension.js"></script><script src="js/timer.js"></script>
+  <script>loadWords(); updateDashboardStats(); initStudyTools();</script>
 </body>
 </html>
