@@ -48,8 +48,52 @@ function createGenderGame(task) {
     const labels = {easy:['EASY','01 / 03'],medium:['MEDIUM','02 / 03'],hard:['HARD','03 / 03']};
     const [name,number] = labels[level] || labels.easy;
     const translation = `<div class="word-translation">${word.russian || ''}${word.english ? ` · ${word.english}` : ''}</div>`;
+    const genderHint = `
+      <div class="gender-hint">
+        <div class="gender-hint-title">Quick hint · noun gender</div>
+        <div class="gender-hint-table">
+          <div class="gender-hint-row gender-hint-head">
+            <span>Gender</span><span>Article</span><span>Common endings</span>
+          </div>
+          <div class="gender-hint-row">
+            <span><a href="https://www.ilearngreek.com/lessons/sounds/genders/1.mp3" target="_blank" rel="noopener">Αρσενικά</a><small>Masculine</small></span>
+            <span><a href="https://www.ilearngreek.com/lessons/sounds/genders/o.mp3" target="_blank" rel="noopener">ο</a></span>
+            <span>
+              <a href="https://www.ilearngreek.com/lessons/sounds/genders/os.mp3" target="_blank" rel="noopener">-ος</a>,
+              <a href="https://www.ilearngreek.com/lessons/sounds/genders/as.mp3" target="_blank" rel="noopener">-ας</a>,
+              <a href="https://www.ilearngreek.com/lessons/sounds/genders/is.mp3" target="_blank" rel="noopener">-ης</a>,
+              <a href="https://www.ilearngreek.com/lessons/sounds/genders/ous.mp3" target="_blank" rel="noopener">-ους</a>,
+              <a href="https://www.ilearngreek.com/lessons/sounds/genders/es.mp3" target="_blank" rel="noopener">-ες</a>
+            </span>
+          </div>
+          <div class="gender-hint-row">
+            <span><a href="https://www.ilearngreek.com/lessons/sounds/genders/2.mp3" target="_blank" rel="noopener">Θηλυκά</a><small>Feminine</small></span>
+            <span><a href="https://www.ilearngreek.com/lessons/sounds/genders/i.mp3" target="_blank" rel="noopener">η</a></span>
+            <span>
+              <a href="https://www.ilearngreek.com/lessons/sounds/genders/os.mp3" target="_blank" rel="noopener">-ος</a>,
+              <a href="https://www.ilearngreek.com/lessons/sounds/genders/iIta.mp3" target="_blank" rel="noopener">-η</a>,
+              <a href="https://www.ilearngreek.com/lessons/sounds/genders/a.mp3" target="_blank" rel="noopener">-α</a>,
+              <a href="https://www.ilearngreek.com/lessons/sounds/genders/oOmega.mp3" target="_blank" rel="noopener">-ω</a>,
+              <a href="https://www.ilearngreek.com/lessons/sounds/genders/ou.mp3" target="_blank" rel="noopener">-ου</a>
+            </span>
+          </div>
+          <div class="gender-hint-row">
+            <span><a href="https://www.ilearngreek.com/lessons/sounds/genders/3.mp3" target="_blank" rel="noopener">Ουδέτερα</a><small>Neuter</small></span>
+            <span><a href="https://www.ilearngreek.com/lessons/sounds/genders/to.mp3" target="_blank" rel="noopener">το</a></span>
+            <span>
+              <a href="https://www.ilearngreek.com/lessons/sounds/genders/os.mp3" target="_blank" rel="noopener">-ος</a>,
+              <a href="https://www.ilearngreek.com/lessons/sounds/genders/iGIOTA.mp3" target="_blank" rel="noopener">-ι</a>,
+              <a href="https://www.ilearngreek.com/lessons/sounds/genders/ma.mp3" target="_blank" rel="noopener">-μα</a>,
+              <a href="https://www.ilearngreek.com/lessons/sounds/genders/o.mp3" target="_blank" rel="noopener">-ο</a>,
+              <a href="https://www.ilearngreek.com/lessons/sounds/genders/as.mp3" target="_blank" rel="noopener">-ας</a>,
+              <a href="https://www.ilearngreek.com/lessons/sounds/genders/a.mp3" target="_blank" rel="noopener">-α</a>
+            </span>
+          </div>
+        </div>
+        <div class="gender-hint-note">These are common patterns, not absolute rules.</div>
+      </div>`;
     const templates = {
-      easy: `<div class="exercise-shell"><div class="exercise-top"><span>GENDERS / ${name}</span><span>${number}</span></div><div class="progress-track"><i style="width:33%"></i></div><div class="prompt-label">WHAT IS THE GENDER?</div><div class="greek-word">${word.greek}</div>${translation}<div class="word-hint">Choose one answer</div><div class="answer-grid three"><button class="answer-card" onclick="currentGame.checkGender('masculine')"><span>ὁ</span><strong>Masculine</strong></button><button class="answer-card" onclick="currentGame.checkGender('feminine')"><span>η</span><strong>Feminine</strong></button><button class="answer-card" onclick="currentGame.checkGender('neuter')"><span>το</span><strong>Neuter</strong></button></div></div>`,
+      easy: `<div class="exercise-shell"><div class="exercise-top"><span>GENDERS / ${name}</span><span>${number}</span></div><div class="progress-track"><i style="width:33%"></i></div><div class="prompt-label">WHAT IS THE GENDER?</div><div class="greek-word">${word.greek}</div>${translation}<div class="word-hint">Choose one answer</div><div class="answer-grid three"><button class="answer-card" onclick="currentGame.checkGender('masculine')"><span>ὁ</span><strong>Masculine</strong></button><button class="answer-card" onclick="currentGame.checkGender('feminine')"><span>η</span><strong>Feminine</strong></button><button class="answer-card" onclick="currentGame.checkGender('neuter')"><span>το</span><strong>Neuter</strong></button></div>${genderHint}</div>`,
       medium: `<div class="exercise-shell"><div class="exercise-top"><span>GENDERS / ${name}</span><span>${number}</span></div><div class="progress-track"><i style="width:66%"></i></div><div class="prompt-label">COMPLETE THE ARTICLE</div><div class="word-line">___ <span>${word.greek}</span></div>${translation}<div class="input-row"><input id="genderAnswer" placeholder="Type the article" autofocus><button class="check-action" onclick="currentGame.checkArticle()">Check</button></div><div class="word-hint">ο / η / το</div></div>`,
       hard: `<div class="exercise-shell"><div class="exercise-top"><span>GENDERS / ${name}</span><span>${number}</span></div><div class="progress-track"><i style="width:100%"></i></div><div class="prompt-label">BUILD THE PLURAL</div><div class="greek-word small">${word.article} ${word.greek}</div>${translation}<div class="hard-form"><label>Plural word<input id="pluralAnswer" placeholder="Plural"></label><label>Plural article<input id="pluralArticleAnswer" placeholder="Article"></label></div><button class="check-action full" onclick="currentGame.checkPlural()">Check answer</button></div>`
     };
