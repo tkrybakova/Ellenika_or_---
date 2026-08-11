@@ -6,7 +6,6 @@ let selectedVocabularyLevel = 'ALL';
 let selectedVocabularyGroup = null;
 
 function getWordGroup(word) {
-  // Новый формат JSON: "group": "Religion"
   return String(word.group || '').trim() || 'Без группы';
 }
 
@@ -39,6 +38,16 @@ function getProgressDots(percent) {
     { length: 4 },
     (_, i) => `<span class="memory-dot ${i < filled ? 'filled' : ''}"></span>`
   ).join('');
+}
+
+// Безопасно вставляет название группы в inline onclick.
+// Это важно для групп вроде: God's plan, Men's health, etc.
+function escapeJsString(value) {
+  return String(value ?? '')
+    .replace(/\\/g, '\\\\')
+    .replace(/'/g, "\\'")
+    .replace(/\r/g, '\\r')
+    .replace(/\n/g, '\\n');
 }
 
 function openDictionary() {
@@ -111,13 +120,16 @@ function renderGroupList() {
 
   return groups.map(([group, words], index) => {
     const progress = getGroupProgress(words);
-
-    // У группы может быть несколько уровней, потому что level принадлежит слову.
     const levels = [...new Set(
       words.map(word => String(word.level || '').toUpperCase()).filter(Boolean)
     )].join(' · ');
+    const safeGroup = escapeJsString(group);
 
-    return `<button class="vocabulary-group-card" onclick="openVocabularyGroup(${JSON.stringify(group)})">
+    // Не используем JSON.stringify внутри HTML-атрибута:
+    // двойные кавычки JSON ломали onclick и делали карточки некликабельными.
+    return `<div class="vocabulary-group-card" role="button" tabindex="0"
+      onclick="openVocabularyGroup('${safeGroup}')"
+      onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();openVocabularyGroup('${safeGroup}')}"">
       <div class="group-card-top">
         <span class="group-number">${String(index + 1).padStart(2, '0')}</span>
         <span class="group-levels">${escapeHtml(levels || '—')}</span>
@@ -128,7 +140,7 @@ function renderGroupList() {
         <span class="memory-progress">${getProgressDots(progress)} <b>${progress}%</b></span>
       </div>
       <div class="group-progress-bar"><span style="width:${progress}%"></span></div>
-    </button>`;
+    </div>`;
   }).join('');
 }
 
@@ -141,6 +153,7 @@ function openVocabularyGroup(group) {
   if (!words.length) return;
 
   const progress = getGroupProgress(words);
+  const safeGroup = escapeJsString(group);
 
   const html = `<section class="group-study-page">
     <div class="group-study-header">
@@ -153,10 +166,10 @@ function openVocabularyGroup(group) {
     </div>
 
     <div class="group-study-actions">
-      <button class="primary-action study-cards-button" onclick="openCardsForGroup(${JSON.stringify(group)})">
+      <button class="primary-action study-cards-button" onclick="openCardsForGroup('${safeGroup}')">
         Study with cards <span>→</span>
       </button>
-      <button class="secondary-action" onclick="openWritingForGroup(${JSON.stringify(group)})">
+      <button class="secondary-action" onclick="openWritingForGroup('${safeGroup}')">
         Practice writing
       </button>
     </div>
