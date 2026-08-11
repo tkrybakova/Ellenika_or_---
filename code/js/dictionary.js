@@ -40,14 +40,10 @@ function getProgressDots(percent) {
   ).join('');
 }
 
-// Безопасно вставляет название группы в inline onclick.
-// Это важно для групп вроде: God's plan, Men's health, etc.
-function escapeJsString(value) {
-  return String(value ?? '')
-    .replace(/\\/g, '\\\\')
-    .replace(/'/g, "\\'")
-    .replace(/\r/g, '\\r')
-    .replace(/\n/g, '\\n');
+// Encode the group name before putting it into an HTML onclick attribute.
+// This handles names containing quotes, apostrophes and other characters.
+function groupClickArgument(group) {
+  return encodeURIComponent(String(group));
 }
 
 function openDictionary() {
@@ -69,15 +65,15 @@ function openDictionary() {
           <span>＋ Load JSON</span>
           <input type="file" accept="application/json,.json" onchange="importJSON(event)">
         </label>
-        <button class="secondary-action" onclick="exportJSON()">↓ Export JSON</button>
+        <button type="button" class="secondary-action" onclick="exportJSON()">↓ Export JSON</button>
       </div>
 
       <div class="vocabulary-levels">
-        <button class="level-filter ${selectedVocabularyLevel === 'ALL' ? 'active' : ''}" onclick="filterVocabulary('ALL')">
+        <button type="button" class="level-filter ${selectedVocabularyLevel === 'ALL' ? 'active' : ''}" onclick="filterVocabulary('ALL')">
           ALL<small>${dictionary.length}</small>
         </button>
         ${VOCAB_LEVELS.map(level => `
-          <button class="level-filter ${selectedVocabularyLevel === level ? 'active' : ''}" onclick="filterVocabulary('${level}')">
+          <button type="button" class="level-filter ${selectedVocabularyLevel === level ? 'active' : ''}" onclick="filterVocabulary('${level}')">
             ${level}<small>${dictionary.filter(w => String(w.level || '').toUpperCase() === level).length}</small>
           </button>
         `).join('')}
@@ -123,13 +119,10 @@ function renderGroupList() {
     const levels = [...new Set(
       words.map(word => String(word.level || '').toUpperCase()).filter(Boolean)
     )].join(' · ');
-    const safeGroup = escapeJsString(group);
+    const encodedGroup = groupClickArgument(group);
 
-    // Не используем JSON.stringify внутри HTML-атрибута:
-    // двойные кавычки JSON ломали onclick и делали карточки некликабельными.
-    return `<div class="vocabulary-group-card" role="button" tabindex="0"
-      onclick="openVocabularyGroup('${safeGroup}')"
-      onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();openVocabularyGroup('${safeGroup}')}"">
+    return `<button type="button" class="vocabulary-group-card"
+      onclick="openVocabularyGroup(decodeURIComponent('${encodedGroup}'))">
       <div class="group-card-top">
         <span class="group-number">${String(index + 1).padStart(2, '0')}</span>
         <span class="group-levels">${escapeHtml(levels || '—')}</span>
@@ -140,7 +133,7 @@ function renderGroupList() {
         <span class="memory-progress">${getProgressDots(progress)} <b>${progress}%</b></span>
       </div>
       <div class="group-progress-bar"><span style="width:${progress}%"></span></div>
-    </div>`;
+    </button>`;
   }).join('');
 }
 
@@ -153,11 +146,11 @@ function openVocabularyGroup(group) {
   if (!words.length) return;
 
   const progress = getGroupProgress(words);
-  const safeGroup = escapeJsString(group);
+  const encodedGroup = groupClickArgument(group);
 
   const html = `<section class="group-study-page">
     <div class="group-study-header">
-      <button class="secondary-action" onclick="openDictionary()">← Groups</button>
+      <button type="button" class="secondary-action" onclick="openDictionary()">← Groups</button>
       <div>
         <div class="section-label">VOCABULARY / ${escapeHtml(selectedVocabularyLevel)}</div>
         <h3>${escapeHtml(group)}</h3>
@@ -166,10 +159,10 @@ function openVocabularyGroup(group) {
     </div>
 
     <div class="group-study-actions">
-      <button class="primary-action study-cards-button" onclick="openCardsForGroup('${safeGroup}')">
+      <button type="button" class="primary-action study-cards-button" onclick="openCardsForGroup(decodeURIComponent('${encodedGroup}'))">
         Study with cards <span>→</span>
       </button>
-      <button class="secondary-action" onclick="openWritingForGroup('${safeGroup}')">
+      <button type="button" class="secondary-action" onclick="openWritingForGroup(decodeURIComponent('${encodedGroup}'))">
         Practice writing
       </button>
     </div>
