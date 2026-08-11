@@ -9,15 +9,26 @@ function getWordGroup(word) {
   return String(word.group || '').trim() || 'Без группы';
 }
 
+function normalizeVocabularyLevel(level) {
+  return String(level || '').trim().toUpperCase();
+}
+
 function getVocabularyLevels() {
-  return VOCAB_LEVELS.filter(level =>
-    dictionary.some(word => String(word.level || '').toUpperCase() === level)
-  );
+  const levels = [...new Set(dictionary.map(word => normalizeVocabularyLevel(word.level)).filter(Boolean))];
+  return levels.sort((a, b) => {
+    const order = ['A0', 'A1', 'A2', 'B1', 'B2', 'C1', 'C2'];
+    const ai = order.indexOf(a), bi = order.indexOf(b);
+    if (ai !== -1 && bi !== -1) return ai - bi;
+    if (ai !== -1) return -1;
+    if (bi !== -1) return 1;
+    return a.localeCompare(b);
+  });
 }
 
 function getWordsForLevel(level) {
-  if (!level) return [];
-  return dictionary.filter(word => String(word.level || '').toUpperCase() === level);
+  const normalized = normalizeVocabularyLevel(level);
+  if (!normalized) return [];
+  return dictionary.filter(word => normalizeVocabularyLevel(word.level) === normalized);
 }
 
 function getVocabularyGroups(level) {
@@ -88,7 +99,7 @@ function renderVocabularyHome() {
           return `
             <button type="button" class="level-filter"
                     onclick="selectVocabularyLevel(decodeURIComponent('${encoded}'))">
-              <span>${level}</span><small>${count}</small>
+              <span>${escapeHtml(level)}</span><small>${count}</small>
             </button>`;
         }).join('')}
       </div>
@@ -105,16 +116,18 @@ function renderVocabularyHome() {
 }
 
 function selectVocabularyLevel(level) {
-  selectedVocabularyLevel = level;
+  selectedVocabularyLevel = normalizeVocabularyLevel(level);
   selectedVocabularyGroup = null;
 
   const list = document.getElementById('group-list');
-  if (list) list.innerHTML = renderSelectedLevel();
+  if (list) {
+    list.innerHTML = renderSelectedLevel();
+    return;
+  }
 
-  document.querySelectorAll('.level-filter').forEach(button => button.classList.remove('active'));
-  const active = [...document.querySelectorAll('.level-filter')]
-    .find(button => button.textContent.trim().startsWith(level));
-  if (active) active.classList.add('active');
+  renderVocabularyHome();
+  const newList = document.getElementById('group-list');
+  if (newList) newList.innerHTML = renderSelectedLevel();
 }
 
 function filterVocabulary(level) {
@@ -188,19 +201,20 @@ function renderGroupList() {
 
 function openVocabularyGroup(group) {
   selectedVocabularyGroup = group;
-  const words = getVocabularyGroups(selectedVocabularyLevel)
+  const level = normalizeVocabularyLevel(selectedVocabularyLevel);
+  const words = getVocabularyGroups(level)
     .find(([name]) => name === group)?.[1] || [];
   if (!words.length) return;
 
   const progress = getGroupProgress(words);
   const encodedGroup = groupClickArgument(group);
-  const encodedLevel = levelClickArgument(selectedVocabularyLevel);
+  const encodedLevel = levelClickArgument(level);
 
   const html = `<section class="group-study-page">
     <div class="group-study-header">
-      <button type="button" class="secondary-action" onclick="selectVocabularyLevel(decodeURIComponent('${encodedLevel}'))">← ${escapeHtml(selectedVocabularyLevel)}</button>
+      <button type="button" class="secondary-action" onclick="backToVocabularyLevel(decodeURIComponent('${encodedLevel}'))">← ${escapeHtml(level)}</button>
       <div>
-        <div class="section-label">VOCABULARY / ${escapeHtml(selectedVocabularyLevel)}</div>
+        <div class="section-label">VOCABULARY / ${escapeHtml(level)}</div>
         <h3>${escapeHtml(group)}</h3>
       </div>
       <div class="group-big-progress"><strong>${progress}%</strong><span>memorized</span></div>
@@ -221,13 +235,24 @@ function openVocabularyGroup(group) {
       ${words.map(word => `
         <div class="word-progress-row">
           <span class="word-progress-name">${escapeHtml(word.greek)}</span>
-          <span class="word-progress-level">${escapeHtml(String(word.level || '').toUpperCase())}</span>
+          <span class="word-progress-level">${escapeHtml(normalizeVocabularyLevel(word.level))}</span>
           <span class="word-progress-dots">${getProgressDots(getWordProgress(word) * 33.333)}</span>
         </div>`).join('')}
     </div>
   </section>`;
 
   renderPage('GROUP', html, 'dictionary-page');
+}
+
+function backToVocabularyLevel(level) {
+  selectedVocabularyLevel = normalizeVocabularyLevel(level);
+  selectedVocabularyGroup = null;
+
+  // renderPage() replaces the whole page, so there is no group-list element
+  // to update here. Re-render the vocabulary page and immediately show level.
+  renderVocabularyHome();
+  const list = document.getElementById('group-list');
+  if (list) list.innerHTML = renderSelectedLevel();
 }
 
 function escapeHtml(value) {
