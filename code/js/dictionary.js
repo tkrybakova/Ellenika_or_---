@@ -35,6 +35,10 @@ function getGroupProgress(words) {
   return Math.round(words.reduce((sum, word) => sum + getWordProgress(word), 0) / (words.length * 3) * 100);
 }
 
+function getLevelProgress(level) {
+  return getGroupProgress(getWordsForLevel(level));
+}
+
 function getProgressDots(percent) {
   const filled = Math.round(percent / 25);
   return Array.from({ length: 4 }, (_, i) =>
@@ -44,6 +48,10 @@ function getProgressDots(percent) {
 
 function groupClickArgument(group) {
   return encodeURIComponent(String(group));
+}
+
+function levelClickArgument(level) {
+  return encodeURIComponent(String(level));
 }
 
 function openDictionary() {
@@ -56,7 +64,7 @@ function openDictionary() {
         <div>
           <div class="section-label">VOCABULARY</div>
           <h3>Levels</h3>
-          <p class="library-subtitle">First choose a level, then a group.</p>
+          <p class="library-subtitle">Choose a level or open its groups.</p>
         </div>
         <span class="word-count">${dictionary.length}</span>
       </div>
@@ -69,17 +77,36 @@ function openDictionary() {
       </div>
 
       <div class="vocabulary-levels">
-        ${levels.map(level => `
-          <button type="button" class="level-filter ${selectedVocabularyLevel === level ? 'active' : ''}"
-                  onclick="filterVocabulary('${level}')">
-            ${level}<small>${getWordsForLevel(level).length}</small>
-          </button>
-        `).join('')}
+        ${levels.map(level => {
+          const encoded = levelClickArgument(level);
+          const count = getWordsForLevel(level).length;
+          const progress = getLevelProgress(level);
+          return `
+            <div class="vocabulary-level-card">
+              <button type="button" class="level-filter ${selectedVocabularyLevel === level ? 'active' : ''}"
+                      onclick="filterVocabulary(decodeURIComponent('${encoded}'))">
+                <span>${level}</span><small>${count}</small>
+              </button>
+              <div class="level-study-actions">
+                <button type="button" class="primary-action level-study-button"
+                        onclick="openCards(decodeURIComponent('${encoded}'))">Cards</button>
+                <button type="button" class="secondary-action level-writing-button"
+                        onclick="openWriting(decodeURIComponent('${encoded}'))">Writing</button>
+              </div>
+              <div class="level-progress">
+                ${getProgressDots(progress)} <b>${progress}%</b>
+              </div>
+              <button type="button" class="level-groups-button"
+                      onclick="filterVocabulary(decodeURIComponent('${encoded}'))">
+                Groups →
+              </button>
+            </div>`;
+        }).join('')}
       </div>
 
       <div id="group-list" class="vocabulary-groups">
         ${selectedVocabularyLevel ? renderGroupList() :
-          `<div class="empty-state compact"><h3>Choose a level</h3><p>Each level has its own groups.</p></div>`}
+          `<div class="empty-state compact"><h3>Choose a level</h3><p>Cards and writing can be started directly from a level.</p></div>`}
       </div>
     </section>`;
 
@@ -106,35 +133,45 @@ function renderGroupList() {
     return `<div class="empty-state compact"><h3>No groups</h3><p>No words have this level.</p></div>`;
   }
 
-  return groups.map(([group, words], index) => {
-    const progress = getGroupProgress(words);
-    const encodedGroup = groupClickArgument(group);
+  return `
+    <div class="groups-heading">
+      <div><div class="section-label">${escapeHtml(selectedVocabularyLevel)}</div><h3>Groups</h3></div>
+      <span>${getWordsForLevel(selectedVocabularyLevel).length} words</span>
+    </div>
+    ${groups.map(([group, words], index) => {
+      const progress = getGroupProgress(words);
+      const encodedGroup = groupClickArgument(group);
+      const encodedLevel = levelClickArgument(selectedVocabularyLevel);
 
-    return `<button type="button" class="vocabulary-group-card"
-      onclick="openVocabularyGroup(decodeURIComponent('${encodedGroup}'))">
-      <div class="group-card-top">
-        <span class="group-number">${String(index + 1).padStart(2, '0')}</span>
-        <span class="group-levels">${escapeHtml(selectedVocabularyLevel)}</span>
-      </div>
-      <div class="group-card-title">${escapeHtml(group)}</div>
-      <div class="group-card-bottom">
-        <span>${words.length} ${words.length === 1 ? 'word' : 'words'}</span>
-        <span class="memory-progress">${getProgressDots(progress)} <b>${progress}%</b></span>
-      </div>
-      <div class="group-progress-bar"><span style="width:${progress}%"></span></div>
-    </button>`;
-  }).join('');
+      return `<button type="button" class="vocabulary-group-card"
+        onclick="openVocabularyGroup(decodeURIComponent('${encodedGroup}'))">
+        <div class="group-card-top">
+          <span class="group-number">${String(index + 1).padStart(2, '0')}</span>
+          <span class="group-levels">${escapeHtml(selectedVocabularyLevel)}</span>
+        </div>
+        <div class="group-card-title">${escapeHtml(group)}</div>
+        <div class="group-card-bottom">
+          <span>${words.length} ${words.length === 1 ? 'word' : 'words'}</span>
+          <span class="memory-progress">${getProgressDots(progress)} <b>${progress}%</b></span>
+        </div>
+        <div class="group-progress-bar"><span style="width:${progress}%"></span></div>
+        <div class="group-card-study">
+          <span onclick="event.stopPropagation();openCardsForGroup(decodeURIComponent('${encodedGroup}'),decodeURIComponent('${encodedLevel}'))">Cards →</span>
+          <span onclick="event.stopPropagation();openWritingForGroup(decodeURIComponent('${encodedGroup}'),decodeURIComponent('${encodedLevel}'))">Writing →</span>
+        </div>
+      </button>`;
+    }).join('')}`;
 }
 
 function openVocabularyGroup(group) {
   selectedVocabularyGroup = group;
   const words = getVocabularyGroups(selectedVocabularyLevel)
     .find(([name]) => name === group)?.[1] || [];
-
   if (!words.length) return;
 
   const progress = getGroupProgress(words);
   const encodedGroup = groupClickArgument(group);
+  const encodedLevel = levelClickArgument(selectedVocabularyLevel);
 
   const html = `<section class="group-study-page">
     <div class="group-study-header">
@@ -148,11 +185,11 @@ function openVocabularyGroup(group) {
 
     <div class="group-study-actions">
       <button type="button" class="primary-action study-cards-button"
-              onclick="openCardsForGroup(decodeURIComponent('${encodedGroup}'), '${selectedVocabularyLevel}')">
+              onclick="openCardsForGroup(decodeURIComponent('${encodedGroup}'),decodeURIComponent('${encodedLevel}'))">
         Study with cards <span>→</span>
       </button>
       <button type="button" class="secondary-action"
-              onclick="openWritingForGroup(decodeURIComponent('${encodedGroup}'), '${selectedVocabularyLevel}')">
+              onclick="openWritingForGroup(decodeURIComponent('${encodedGroup}'),decodeURIComponent('${encodedLevel}'))">
         Practice writing
       </button>
     </div>
