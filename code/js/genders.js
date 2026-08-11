@@ -1,5 +1,31 @@
 let currentGame = null;
 let currentLevel = 'easy';
+let genderTimer = null;
+let genderTimeLeft = 60;
+
+function startGenderTimer() {
+  clearInterval(genderTimer);
+  genderTimeLeft = 60;
+  const update = () => {
+    const timer = document.getElementById('gender-timer');
+    if (!timer) return;
+    const minutes = Math.floor(genderTimeLeft / 60);
+    const seconds = genderTimeLeft % 60;
+    timer.textContent = `${minutes}:${String(seconds).padStart(2, '0')}`;
+    timer.classList.toggle('warning', genderTimeLeft <= 15);
+  };
+  update();
+  genderTimer = setInterval(() => {
+    genderTimeLeft--;
+    update();
+    if (genderTimeLeft <= 0) {
+      clearInterval(genderTimer);
+      if (currentGame && !currentGame.isAnswered()) {
+        currentGame.timeUp();
+      }
+    }
+  }, 1000);
+}
 
 function createGenderGame(task) {
   const word = task;
@@ -7,11 +33,17 @@ function createGenderGame(task) {
 
   function result(correct, message) {
     answered = true;
+    clearInterval(genderTimer);
     let el = document.getElementById('gender-result');
     if (!el) { el = document.createElement('div'); el.id = 'gender-result'; document.getElementById('content').appendChild(el); }
     el.className = correct ? 'correct practice-result' : 'wrong practice-result';
     el.textContent = (correct ? '✓ ' : '! ') + message;
     showNext();
+  }
+
+  function timeUp() {
+    if (answered) return;
+    result(false, `Time's up. Correct answer: ${word.article} ${word.greek}.`);
   }
 
   function checkGender(selected) {
@@ -67,17 +99,20 @@ function createGenderGame(task) {
   function render(level) {
     const labels={easy:['EASY','01 / 03'],medium:['MEDIUM','02 / 03'],hard:['HARD','03 / 03']}; const [name,number]=labels[level]||labels.easy;
     const translation=`<div class="word-translation">${word.russian||''}${word.english?` · ${word.english}`:''}</div>`;
+    const timer=`<div class="gender-timer-wrap" aria-live="polite"><span class="gender-timer-label">TIME</span><span id="gender-timer" class="gender-timer">1:00</span></div>`;
     const templates={
-      easy:`<div class="exercise-shell"><div class="exercise-top"><span>GENDERS / ${name}</span><span>${number}</span></div><div class="progress-track"><i style="width:33%"></i></div><div class="prompt-label">WHAT IS THE GENDER?</div><div class="greek-word">${word.greek}</div>${translation}<div class="word-hint">Choose one answer</div><div class="answer-grid three"><button class="answer-card" onclick="currentGame.checkGender('masculine')"><span>ὁ</span><strong>Masculine</strong></button><button class="answer-card" onclick="currentGame.checkGender('feminine')"><span>η</span><strong>Feminine</strong></button><button class="answer-card" onclick="currentGame.checkGender('neuter')"><span>το</span><strong>Neuter</strong></button></div>${easyHint}</div>`,
-      medium:`<div class="exercise-shell"><div class="exercise-top"><span>GENDERS / ${name}</span><span>${number}</span></div><div class="progress-track"><i style="width:66%"></i></div><div class="prompt-label">COMPLETE THE ARTICLE</div><div class="word-line">___ <span>${word.greek}</span></div>${translation}<div class="input-row"><input id="genderAnswer" placeholder="Type the article" autofocus><button class="check-action" onclick="currentGame.checkArticle()">Check</button></div><div class="word-hint">ο / η / το</div>${easyHint}</div>`,
-      hard:`<div class="exercise-shell"><div class="exercise-top"><span>GENDERS / ${name}</span><span>${number}</span></div><div class="progress-track"><i style="width:100%"></i></div><div class="prompt-label">BUILD THE PLURAL</div><div class="greek-word small">${word.article} ${word.greek}</div>${translation}<div class="hard-form"><label>Plural word<input id="pluralAnswer" placeholder="Plural"></label><label>Plural article<input id="pluralArticleAnswer" placeholder="Article"></label></div><button class="check-action full" onclick="currentGame.checkPlural()">Check answer</button>${fullHint}</div>`};
+      easy:`<div class="exercise-shell"><div class="exercise-top"><span>GENDERS / ${name}</span><span>${number}</span>${timer}</div><div class="progress-track"><i style="width:33%"></i></div><div class="prompt-label">WHAT IS THE GENDER?</div><div class="greek-word">${word.greek}</div>${translation}<div class="word-hint">Choose one answer</div><div class="answer-grid three"><button class="answer-card" onclick="currentGame.checkGender('masculine')"><span>ὁ</span><strong>Masculine</strong></button><button class="answer-card" onclick="currentGame.checkGender('feminine')"><span>η</span><strong>Feminine</strong></button><button class="answer-card" onclick="currentGame.checkGender('neuter')"><span>το</span><strong>Neuter</strong></button></div>${easyHint}</div>`,
+      medium:`<div class="exercise-shell"><div class="exercise-top"><span>GENDERS / ${name}</span><span>${number}</span>${timer}</div><div class="progress-track"><i style="width:66%"></i></div><div class="prompt-label">COMPLETE THE ARTICLE</div><div class="word-line">___ <span>${word.greek}</span></div>${translation}<div class="input-row"><input id="genderAnswer" placeholder="Type the article" autofocus><button class="check-action" onclick="currentGame.checkArticle()">Check</button></div><div class="word-hint">ο / η / το</div>${easyHint}</div>`,
+      hard:`<div class="exercise-shell"><div class="exercise-top"><span>GENDERS / ${name}</span><span>${number}</span>${timer}</div><div class="progress-track"><i style="width:100%"></i></div><div class="prompt-label">BUILD THE PLURAL</div><div class="greek-word small">${word.article} ${word.greek}</div>${translation}<div class="hard-form"><label>Plural word<input id="pluralAnswer" placeholder="Plural"></label><label>Plural article<input id="pluralArticleAnswer" placeholder="Article"></label></div><button class="check-action full" onclick="currentGame.checkPlural()">Check answer</button>${fullHint}</div>`};
     document.getElementById('content').innerHTML=templates[level]||templates.easy; currentLevel=level; answered=false;
     document.querySelectorAll('#content input').forEach(i=>i.addEventListener('keydown',e=>{if(e.key==='Enter')document.querySelector('#content .check-action')?.click();}));
+    startGenderTimer();
   }
-  return {checkGender,checkArticle,checkPlural,render,word};
+  return {checkGender,checkArticle,checkPlural,render,word,isAnswered:()=>answered,timeUp};
 }
 
 function startGender(level){
+  clearInterval(genderTimer);
   if(!dictionary||!dictionary.length){document.getElementById('content').innerHTML='<div class="empty-state"><h3>Your dictionary is empty</h3><p>Add words before starting practice.</p></div>';return;}
   currentGame=createGenderGame(dictionary[Math.floor(Math.random()*dictionary.length)]); currentGame.render(level);
 }
