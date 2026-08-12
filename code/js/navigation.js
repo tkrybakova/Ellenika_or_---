@@ -15,7 +15,7 @@ function openDeclension() {
     renderPage('DECLENSION', emptyState('Your vocabulary is empty', 'Add a few Greek words first.'));
     return;
   }
-  renderPage('DECLENSION', renderLevelButtons(['easy', 'medium'], 'startDeclension'), 'practice-page');
+  renderPage('DECLENSION', renderLevelButtons(['easy', 'medium', 'hard'], 'startDeclension'), 'practice-page');
 }
 
 function emptyState(title, text) {
