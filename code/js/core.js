@@ -22,9 +22,24 @@ function capitalize(str){return str.charAt(0).toUpperCase()+str.slice(1);}
 function renderLevelButtons(levels,startFn){
   const descriptions={easy:['EASY','Choose an answer','10 PTS'],medium:['MEDIUM','Recall from memory','15 PTS'],hard:['HARD','Build the form','20 PTS']};
   const icons={easy:'01',medium:'02',hard:'03'};
-  return `<div class="practice-selector f1-selector">
+  return `<style>
+    .f1-level-list{display:flex;flex-direction:column;gap:10px;width:100%;max-width:860px;margin:4px auto 24px}
+    .f1-level-list .level-tab{position:relative;display:grid;grid-template-columns:54px 1fr auto 28px;align-items:center;gap:16px;width:100%;min-height:76px;margin:0;padding:0 18px 0 0;border:1px solid #30333a;border-radius:2px;background:linear-gradient(100deg,#191b20,#111317);color:#fff;text-align:left;overflow:hidden;cursor:pointer;transition:.18s}
+    .f1-level-list .level-tab:before{content:'';position:absolute;left:0;top:0;bottom:0;width:6px;background:#777;transition:.18s}
+    .f1-level-list .level-easy:before{background:#31b86b}.f1-level-list .level-medium:before{background:#f0c52b}.f1-level-list .level-hard:before{background:#e10600}
+    .f1-level-list .level-tab:hover{background:linear-gradient(100deg,#24272d,#17191e);border-color:#555960;transform:translateX(3px)}
+    .f1-level-list .level-number{display:flex;align-items:center;justify-content:center;height:100%;color:#777c85;font:800 10px 'Arial Narrow',Arial,sans-serif;letter-spacing:.12em}
+    .f1-level-list .level-main{display:flex;flex-direction:column;gap:5px;min-width:0}
+    .f1-level-list .level-main b{font:900 19px Arial,sans-serif;font-style:italic;letter-spacing:-.03em;color:#fff}
+    .f1-level-list .level-main small{font:700 9px 'Arial Narrow',Arial,sans-serif;letter-spacing:.12em;text-transform:uppercase;color:#858992}
+    .f1-level-list .level-tab>strong{color:#d9dbe0;font:900 10px 'Arial Narrow',Arial,sans-serif;letter-spacing:.08em;white-space:nowrap}
+    .f1-level-list .level-tab>i{color:#777c85;font:900 18px Arial,sans-serif;font-style:normal}
+    .f1-level-list .level-easy:hover .level-main b{color:#31b86b}.f1-level-list .level-medium:hover .level-main b{color:#f0c52b}.f1-level-list .level-hard:hover .level-main b{color:#e10600}
+    @media(max-width:600px){.f1-level-list{gap:8px}.f1-level-list .level-tab{grid-template-columns:40px 1fr auto 20px;gap:10px;min-height:68px;padding-right:12px}.f1-level-list .level-number{font-size:9px}.f1-level-list .level-main b{font-size:16px}.f1-level-list .level-main small{font-size:8px}.f1-level-list .level-tab>strong{font-size:8px}.f1-level-list .level-tab>i{font-size:15px}}
+  </style>
+  <div class="practice-selector f1-selector">
     <div class="selector-head"><div><span class="selector-label">RACE MODE</span><p>Select your training intensity</p></div><span class="selector-lights">● ● ●</span></div>
-    <div class="level-tabs">${levels.map(level=>{const item=descriptions[level]||[capitalize(level),'Practice',''];return `<button class="level-tab level-${level}" onclick="${startFn}('${level}')"><span class="level-number">${icons[level]||'00'}</span><span class="level-main"><b>${item[0]}</b><small>${item[1]}</small></span><strong>${item[2]}</strong><i>→</i></button>`;}).join('')}</div>
+    <div class="f1-level-list">${levels.map(level=>{const item=descriptions[level]||[capitalize(level),'Practice',''];return `<button class="level-tab level-${level}" onclick="${startFn}('${level}')"><span class="level-number">${icons[level]||'00'}</span><span class="level-main"><b>${item[0]}</b><small>${item[1]}</small></span><strong>${item[2]}</strong><i>→</i></button>`;}).join('')}</div>
   </div>`;
 }
 
