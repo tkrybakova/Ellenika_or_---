@@ -3,48 +3,60 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="description" content="Ellenika — Greek language trainer.">
-  <title>Ellenika</title>
-  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🇬🇷</text></svg>">
+  <meta name="description" content="Ellenika — Greek language trainer with F1 progression.">
+  <title>Ellenika — F1 Greek Trainer</title>
   <link rel="stylesheet" href="style.css">
-  <link rel="stylesheet" href="ui.css">
-  <link rel="stylesheet" href="groups.css">
 </head>
 <body>
   <main class="app-shell">
     <section id="home-screen" class="home-screen" aria-label="Choose language">
-      <div class="home-glow home-glow-one"></div><div class="home-glow home-glow-two"></div>
-      <div class="brand-line">YOUR SKILL · YOUR POWER</div>
-      <button class="language-link english-link" onclick="showLanguageMessage('English B1')"><span>ENGLISH</span><strong>B1</strong></button>
-      <button class="language-link greek-link" onclick="openGreekDashboard()"><span>GREEK</span><strong>A1</strong></button>
-      <div class="choose-language" aria-hidden="true"><span>CHOOSE</span><span>LANGUAGE</span></div>
-      <div class="home-footer">ELLENIKA <span>•</span> GREEK LANGUAGE TRAINER</div>
+      <div class="brand-line">ELLENIKA</div>
+      <button class="language-link english-link" onclick="showLanguageMessage('English B1')"><span>ENGLISH</span><strong>COMING SOON</strong></button>
+      <button class="language-link greek-link" onclick="openGreekDashboard()"><span>GREEK</span><strong>A1 · START RACE</strong></button>
+      <div class="choose-language" aria-hidden="true"><span>LIGHTS</span><span>OUT</span></div>
+      <div class="home-footer">YOUR LANGUAGE · YOUR LAP · YOUR POINTS <span>•</span> ELLENIKA</div>
     </section>
+
     <section id="dashboard-screen" class="dashboard-screen hidden" aria-label="Greek dashboard">
-      <button class="back-button" onclick="showHome()" aria-label="Back to language selection">←</button>
+      <button class="back-button" onclick="showHome()" aria-label="Back">←</button>
       <div class="dashboard-content">
-        <div class="dashboard-kicker">LANGUAGE / A1</div><div class="dashboard-title">GREEK</div>
+        <div class="dashboard-kicker">ELLENIKA / A1 / RACE CONTROL</div>
+        <div class="dashboard-title">GREEK</div>
         <div class="stats-list">
-          <button class="stat-row" onclick="openDictionary()"><span>VOCABULARY</span><strong id="vocabulary-progress">0/3500</strong></button>
+          <button class="stat-row" onclick="openDictionary()"><span>VOCABULARY</span><strong id="vocabulary-progress">0/0</strong></button>
           <button class="stat-row" onclick="openGenders()"><span>GENDERS</span><strong id="genders-progress">0%</strong></button>
           <button class="stat-row" onclick="openDeclension()"><span>DECLENSION</span><strong id="declension-progress">19%</strong></button>
+          <button class="stat-row" onclick="openF1Drivers()"><span>DRIVER GRID</span><strong id="f1-unlock-count">0/22</strong></button>
         </div>
+        <div id="f1-driver-progress" style="margin-top:20px"></div>
       </div>
     </section>
+
     <section id="content-screen" class="content-screen hidden" aria-live="polite">
       <button class="back-button content-back" onclick="openGreekDashboard()" aria-label="Back to Greek dashboard">←</button>
       <div id="content"></div>
     </section>
+
     <aside id="study-tools" class="study-tools" aria-label="Study timer and score">
       <div class="study-tool timer-tool">
         <span class="tool-label">FOCUS</span>
         <strong id="study-timer-display">30:00</strong>
         <div class="timer-actions"><button id="study-timer-toggle" onclick="toggleStudyTimer()">Start</button><button onclick="resetStudyTimer()" aria-label="Reset timer">↻</button></div>
       </div>
-      <div class="study-tool score-tool"><span class="tool-label">SCORE</span><strong id="study-score">0 pts</strong></div>
+      <div class="study-tool score-tool"><span class="tool-label">CHAMPIONSHIP POINTS</span><strong id="study-score">0 pts</strong></div>
     </aside>
   </main>
-  <script src="js/storage.js"></script><script src="js/core.js"></script><script src="js/dictionary.js"></script><script src="js/cards.js"></script><script src="js/json.js"></script><script src="js/navigation.js"></script><script src="js/genders.js"></script><script src="js/declension.js"></script><script src="js/timer.js"></script>
+
+  <script src="js/storage.js"></script>
+  <script src="js/core.js"></script>
+  <script src="js/dictionary.js"></script>
+  <script src="js/cards.js"></script>
+  <script src="js/json.js"></script>
+  <script src="js/navigation.js"></script>
+  <script src="js/genders.js"></script>
+  <script src="js/declension.js"></script>
+  <script src="js/timer.js"></script>
+  <script src="js/f1.js"></script>
   <script>loadWords(); updateDashboardStats(); initStudyTools();</script>
 </body>
 </html>
