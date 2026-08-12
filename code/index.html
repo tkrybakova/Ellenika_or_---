@@ -6,6 +6,7 @@
   <meta name="description" content="Ellenika — Greek language trainer with F1 progression.">
   <title>Ellenika — F1 Greek Trainer</title>
   <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="groups.css">
 </head>
 <body>
   <main class="app-shell">
@@ -36,6 +37,8 @@
       <button class="back-button content-back" onclick="openGreekDashboard()" aria-label="Back to Greek dashboard">←</button>
       <div id="content"></div>
     </section>
+
+    <aside id="f1-broadcast" class="f1-broadcast hidden" aria-live="polite" aria-label="F1 live broadcast message"></aside>
 
     <aside id="study-tools" class="study-tools" aria-label="Study timer and score">
       <div class="study-tool timer-tool">
