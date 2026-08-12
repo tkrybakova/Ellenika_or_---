@@ -73,6 +73,11 @@ function showDriverMotivation(){
 
 function countPracticeAnswers(){return Number(sessionStorage.getItem('ellenika_practice_count')||0)%5||5;}
 
+document.addEventListener('click',event=>{
+  const next=event.target.closest('#next-declension-btn');
+  if(next)registerPracticeAnswer();
+});
+
 function showResult(text){console.warn('showResult() is deprecated.');content.innerHTML+=`<div class="result-card">${text}</div>`;}
 
 function injectF1MotivationStyles(){
