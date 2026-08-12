@@ -18,5 +18,25 @@ function updateDashboardStats(){
 }
 function renderPage(title,bodyHTML,extraClass=''){clearGameState();showScreen('content-screen');content.innerHTML=`<div class="page-heading"><div class="page-eyebrow">ELLENIKA / GREEK</div><h2>${title}</h2></div><div class="page-content ${extraClass}">${bodyHTML}</div>`;}
 function capitalize(str){return str.charAt(0).toUpperCase()+str.slice(1);}
-function renderLevelButtons(levels,startFn){const descriptions={easy:['EASY','Choose an answer'],medium:['MEDIUM','Recall from memory'],hard:['HARD','Build the form']};return `<div class="practice-selector"><div><span class="selector-label">PRACTICE</span><p>Choose how you want to train.</p></div><div class="level-tabs">${levels.map(level=>{const item=descriptions[level]||[capitalize(level),'Practice'];return `<button class="level-tab level-${level}" onclick="${startFn}('${level}')"><span>${item[0]}</span><small>${item[1]}</small></button>`;}).join('')}</div></div>`;}
+
+function renderLevelButtons(levels,startFn){
+  const descriptions={easy:['EASY','Choose an answer','10 PTS'],medium:['MEDIUM','Recall from memory','15 PTS'],hard:['HARD','Build the form','20 PTS']};
+  const icons={easy:'01',medium:'02',hard:'03'};
+  return `<div class="practice-selector f1-selector">
+    <div class="selector-head"><div><span class="selector-label">RACE MODE</span><p>Select your training intensity</p></div><span class="selector-lights">● ● ●</span></div>
+    <div class="level-tabs">${levels.map(level=>{const item=descriptions[level]||[capitalize(level),'Practice',''];return `<button class="level-tab level-${level}" onclick="${startFn}('${level}')"><span class="level-number">${icons[level]||'00'}</span><span class="level-main"><b>${item[0]}</b><small>${item[1]}</small></span><strong>${item[2]}</strong><i>→</i></button>`;}).join('')}</div>
+  </div>`;
+}
+
+function registerPracticeAnswer(){
+  let count=Number(sessionStorage.getItem('ellenika_practice_count')||0)+1;
+  sessionStorage.setItem('ellenika_practice_count',String(count));
+  if(count%5===0 && typeof showF1BroadcastMessage==='function') setTimeout(showF1BroadcastMessage,250);
+}
+
+document.addEventListener('click',event=>{
+  const next=event.target.closest('#next-declension-btn');
+  if(next)registerPracticeAnswer();
+});
+
 function showResult(text){console.warn('showResult() is deprecated.');content.innerHTML+=`<div class="result-card">${text}</div>`;}
