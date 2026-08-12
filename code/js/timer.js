@@ -1,80 +1,11 @@
-// Study timer + points
-let studyTimerSeconds = 30 * 60;
-let studyTimerRunning = false;
-let studyTimerInterval = null;
-
-function getScore() {
-  return Number(localStorage.getItem('ellenikaScore') || 0);
-}
-
-function addScore(points = 0) {
-  const value = Math.max(0, Number(points) || 0);
-  if (!value) return getScore();
-  const total = getScore() + value;
-  localStorage.setItem('ellenikaScore', String(total));
-  updateScoreUI();
-  return total;
-}
-
-function updateScoreUI() {
-  const el = document.getElementById('study-score');
-  if (el) el.textContent = `${getScore()} pts`;
-}
-
-function formatTimer(seconds) {
-  const m = Math.floor(seconds / 60).toString().padStart(2, '0');
-  const s = (seconds % 60).toString().padStart(2, '0');
-  return `${m}:${s}`;
-}
-
-function updateTimerUI() {
-  const display = document.getElementById('study-timer-display');
-  const button = document.getElementById('study-timer-toggle');
-  if (display) {
-    display.textContent = formatTimer(studyTimerSeconds);
-    display.classList.toggle('timer-finished', studyTimerSeconds === 0);
-  }
-  if (button) button.textContent = studyTimerRunning ? 'Pause' : (studyTimerSeconds === 0 ? 'Restart' : 'Start');
-}
-
-function tickStudyTimer() {
-  if (!studyTimerRunning) return;
-  if (studyTimerSeconds <= 0) {
-    pauseStudyTimer();
-    if (typeof speechSynthesis !== 'undefined') speechSynthesis.cancel();
-    alert('30 minutes are over. Take a short break.');
-    return;
-  }
-  studyTimerSeconds -= 1;
-  updateTimerUI();
-}
-
-function toggleStudyTimer() {
-  if (studyTimerRunning) {
-    pauseStudyTimer();
-    return;
-  }
-  if (studyTimerSeconds <= 0) studyTimerSeconds = 30 * 60;
-  studyTimerRunning = true;
-  clearInterval(studyTimerInterval);
-  studyTimerInterval = setInterval(tickStudyTimer, 1000);
-  updateTimerUI();
-}
-
-function pauseStudyTimer() {
-  studyTimerRunning = false;
-  clearInterval(studyTimerInterval);
-  studyTimerInterval = null;
-  updateTimerUI();
-}
-
-function resetStudyTimer() {
-  pauseStudyTimer();
-  studyTimerSeconds = 30 * 60;
-  updateTimerUI();
-}
-
-function initStudyTools() {
-  updateTimerUI();
-  updateScoreUI();
-}
+let studyTimerSeconds=30*60;let studyTimerRunning=false;let studyTimerInterval=null;
+function getScore(){return Number(localStorage.getItem('ellenikaScore')||0);}
+function addScore(points=0){const value=Math.max(0,Number(points)||0);if(!value)return getScore();const total=getScore()+value;localStorage.setItem('ellenikaScore',String(total));updateScoreUI();if(typeof updateDashboardStats==='function')updateDashboardStats();if(typeof renderDriverProgress==='function'&&document.getElementById('f1-driver-progress'))renderDriverProgress();return total;}
+function updateScoreUI(){const el=document.getElementById('study-score');if(el)el.textContent=`${getScore()} pts`;const count=document.getElementById('f1-unlock-count');if(count&&typeof getUnlockedDrivers==='function')count.textContent=`${getUnlockedDrivers().length}/${F1_DRIVERS.length}`;}
+function formatTimer(seconds){const m=Math.floor(seconds/60).toString().padStart(2,'0');const s=(seconds%60).toString().padStart(2,'0');return `${m}:${s}`;}
+function updateTimerUI(){const display=document.getElementById('study-timer-display');const button=document.getElementById('study-timer-toggle');if(display){display.textContent=formatTimer(studyTimerSeconds);display.classList.toggle('timer-finished',studyTimerSeconds===0);}if(button)button.textContent=studyTimerRunning?'Pause':(studyTimerSeconds===0?'Restart':'Start');}
+function tickStudyTimer(){if(!studyTimerRunning)return;if(studyTimerSeconds<=0){pauseStudyTimer();if(typeof speechSynthesis!=='undefined')speechSynthesis.cancel();alert('30 minutes are over. Take a short break.');return;}studyTimerSeconds-=1;updateTimerUI();}
+function toggleStudyTimer(){if(studyTimerRunning){pauseStudyTimer();return;}if(studyTimerSeconds<=0)studyTimerSeconds=30*60;studyTimerRunning=true;clearInterval(studyTimerInterval);studyTimerInterval=setInterval(tickStudyTimer,1000);updateTimerUI();}
+function pauseStudyTimer(){studyTimerRunning=false;clearInterval(studyTimerInterval);studyTimerInterval=null;updateTimerUI();}
+function resetStudyTimer(){pauseStudyTimer();studyTimerSeconds=30*60;updateTimerUI();}
+function initStudyTools(){updateTimerUI();updateScoreUI();}
