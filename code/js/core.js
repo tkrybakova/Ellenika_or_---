@@ -1,22 +1,46 @@
 const content = document.getElementById('content');
 
-function clearGameState(){window.currentGame=null;window.currentDeclensionGame=null;window.genderTask=null;window.adjectiveGame=null;}
-function showScreen(id){['home-screen','dashboard-screen','content-screen'].forEach(screenId=>{const el=document.getElementById(screenId);if(el)el.classList.toggle('hidden',screenId!==id);});}
+function clearGameState(){
+  window.currentGame=null;
+  window.currentDeclensionGame=null;
+  window.genderTask=null;
+  window.adjectiveGame=null;
+  if(typeof genderTimer!=='undefined')clearInterval(genderTimer);
+  if(typeof adjectiveTimer!=='undefined')clearInterval(adjectiveTimer);
+  if(window.ellenikaDeclensionTimer)clearInterval(window.ellenikaDeclensionTimer);
+}
+
+function showScreen(id){
+  ['home-screen','dashboard-screen','content-screen'].forEach(screenId=>{
+    const el=document.getElementById(screenId);
+    if(el)el.classList.toggle('hidden',screenId!==id);
+  });
+}
 function showHome(){showScreen('home-screen');}
 function openGreekDashboard(){updateDashboardStats();showScreen('dashboard-screen');}
 function showLanguageMessage(language){alert(language+' is not available yet.');}
+
 function updateDashboardStats(){
   const vocabulary=document.getElementById('vocabulary-progress');
   const genders=document.getElementById('genders-progress');
   const declension=document.getElementById('declension-progress');
   const learned=dictionary.filter(w=>getWordProgress(w)>=3).length;
   if(vocabulary)vocabulary.textContent=`${learned}/${dictionary.length||0}`;
-  if(genders)genders.textContent='50%';
-  if(declension)declension.textContent='19%';
+  if(genders)genders.textContent=`${typeof getGrammarProgress==='function'?getGrammarProgress('genders'):0}%`;
+  if(declension)declension.textContent=`${typeof getGrammarProgress==='function'?getGrammarProgress('declension'):0}%`;
   if(typeof renderDriverProgress==='function')renderDriverProgress();
 }
-function renderPage(title,bodyHTML,extraClass=''){clearGameState();showScreen('content-screen');content.innerHTML=`<div class="page-heading"><div class="page-eyebrow">ELLENIKA / GREEK</div><h2>${title}</h2></div><div class="page-content ${extraClass}">${bodyHTML}</div>`;}
-function capitalize(str){return str.charAt(0).toUpperCase()+str.slice(1);}
+
+function renderPage(title,bodyHTML,extraClass=''){
+  clearGameState();
+  showScreen('content-screen');
+  content.innerHTML=`<div class="page-heading"><div class="page-eyebrow">ELLENIKA / GREEK</div><h2>${title}</h2></div><div class="page-content ${extraClass}">${bodyHTML}</div>`;
+}
+
+function capitalize(str){
+  const value=String(str||'');
+  return value.charAt(0).toUpperCase()+value.slice(1);
+}
 
 function renderLevelButtons(levels,startFn){
   const descriptions={easy:['EASY','Choose an answer','10 PTS'],medium:['MEDIUM','Recall from memory','15 PTS'],hard:['HARD','Build the form','20 PTS']};
@@ -45,12 +69,4 @@ function renderLevelButtons(levels,startFn){
 function registerPracticeAnswer(){
   let count=Number(sessionStorage.getItem('ellenika_practice_count')||0)+1;
   sessionStorage.setItem('ellenika_practice_count',String(count));
-  if(count%5===0 && typeof showF1BroadcastMessage==='function') setTimeout(showF1BroadcastMessage,250);
 }
-
-document.addEventListener('click',event=>{
-  const next=event.target.closest('#next-declension-btn');
-  if(next)registerPracticeAnswer();
-});
-
-function showResult(text){console.warn('showResult() is deprecated.');content.innerHTML+=`<div class="result-card">${text}</div>`;}
