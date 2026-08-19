@@ -12,9 +12,6 @@ function finishPronounPractice(correct, message, level) {
     result.className = correct ? 'correct practice-result' : 'wrong practice-result';
     result.textContent = `${correct ? '✓' : '✕'} ${message}${correct ? `  +${PRACTICE_POINTS[level] || 10} pts` : ''}`;
   }
-
-  const next = document.getElementById('next-practice-btn');
-  if (next) next.disabled = false;
 }
 
 function startPronoun(level = 'easy') {
@@ -62,8 +59,7 @@ function startPronoun(level = 'easy') {
 
   const rowIndex = Math.floor(Math.random() * rows.length);
   const row = rows[rowIndex];
-  const candidates = row
-    .map((value, index) => ({ value, index }))
+  const candidates = row.map((value, index) => ({ value, index }))
     .filter(item => item.index > 0 && String(item.value || '').trim() && item.value !== '—');
   if (!candidates.length) {
     renderPage('PRONOUNS', emptyState('PRONOUNS is not ready', 'This section has no usable answer data.'), 'practice-page');
@@ -75,7 +71,7 @@ function startPronoun(level = 'easy') {
 
   const visibleRow = row.map((value, index) => index === target.index ? '___' : value);
   const caseLabel = pronounSection.cases?.[rowIndex] || `Form ${rowIndex + 1}`;
-  const rowHtml = visibleRow.map((value, index) => `<span class="pronoun-form-cell ${index === target.targetIndex ? 'target' : ''}">${escapeHtml(value)}</span>`).join('');
+  const rowHtml = visibleRow.map((value, index) => `<span class="pronoun-form-cell ${index === fixedPronounTarget.targetIndex ? 'target' : ''}">${escapeHtml(value)}</span>`).join('');
 
   const html = `<div class="pronoun-exercise f1-practice-card">
     <div class="exercise-top"><span>${escapeHtml(pronounSection.title)}</span><span>HARD · 03</span></div>
@@ -85,6 +81,7 @@ function startPronoun(level = 'easy') {
     <div class="pronoun-case-label">${escapeHtml(caseLabel)}</div>
     <div class="pronoun-row-preview">${rowHtml}</div>
     <input id="fixed-pronoun-answer" class="pronoun-answer-input" autocomplete="off" placeholder="Type the missing form" autofocus>
+    <button class="check-action" id="fixed-pronoun-check">CHECK</button>
     ${renderFixedResultArea('NEXT →', () => startPronoun('hard'))}
   </div>`;
 
@@ -109,7 +106,7 @@ function startPronoun(level = 'easy') {
   });
 }
 
-// Keep the degree-identification choices in a stable semantic order.
+// Keep degree-identification choices in a stable semantic order.
 function startAdjective(level = 'easy') {
   clearInterval(typeof adjectiveTimer !== 'undefined' ? adjectiveTimer : null);
   adjectiveLevel = level;
@@ -140,13 +137,10 @@ function startAdjective(level = 'easy') {
     return;
   }
 
-  // Medium and hard retain the same answer/scoring behavior as the shared implementation.
-  if (typeof window._baseStartAdjective === 'undefined') window._baseStartAdjective = null;
-  const wordForTask = word;
-  const degree = level === 'medium' ? wordForTask.comparative : wordForTask.superlative;
+  const degree = level === 'medium' ? word.comparative : word.superlative;
   const task = level === 'medium'
-    ? `<div class="adj-prompt">WRITE THE COMPARATIVE</div><div class="adj-word">${escapeHtml(wordForTask.positive)}</div><div class="adj-meaning">${escapeHtml(wordForTask.meaning)}</div><div class="adj-input"><input id="adj-comparative" placeholder="Comparative"><button class="check-action" id="adj-check">CHECK</button></div>`
-    : `<div class="adj-prompt">WRITE BOTH DEGREES</div><div class="adj-word">${escapeHtml(wordForTask.positive)}</div><div class="adj-meaning">${escapeHtml(wordForTask.meaning)}</div><div class="adj-hard"><label>Comparative<input id="adj-comparative" placeholder="Comparative"></label><label>Superlative<input id="adj-superlative" placeholder="Superlative"></label></div><button class="check-action" id="adj-check">CHECK ANSWER</button>`;
+    ? `<div class="adj-prompt">WRITE THE COMPARATIVE</div><div class="adj-word">${escapeHtml(word.positive)}</div><div class="adj-meaning">${escapeHtml(word.meaning)}</div><div class="adj-input"><input id="adj-comparative" placeholder="Comparative"><button class="check-action" id="adj-check">CHECK</button></div>`
+    : `<div class="adj-prompt">WRITE BOTH DEGREES</div><div class="adj-word">${escapeHtml(word.positive)}</div><div class="adj-meaning">${escapeHtml(word.meaning)}</div><div class="adj-hard"><label>Comparative<input id="adj-comparative" placeholder="Comparative"></label><label>Superlative<input id="adj-superlative" placeholder="Superlative"></label></div><button class="check-action" id="adj-check">CHECK ANSWER</button>`;
 
   document.getElementById('content').innerHTML = `<div class="adjective-redesign"><div class="exercise-shell"><div class="exercise-top"><span>ADJECTIVES / ${name}</span><span>${number}</span></div><div class="progress-track"><i style="width:${level === 'medium' ? 66 : 100}%"></i></div>${task}${renderFixedResultArea('Next adjective →', () => startAdjective(level))}</div></div>`;
   let answered = false;
@@ -164,8 +158,8 @@ function startAdjective(level = 'easy') {
       const comparative = normalizeAnswer(document.getElementById('adj-comparative')?.value);
       const superlative = normalizeAnswer(document.getElementById('adj-superlative')?.value);
       if (!comparative || !superlative) return;
-      const correct = comparative === normalizeAnswer(wordForTask.comparative) && superlative === normalizeAnswer(wordForTask.superlative);
-      finish(correct, correct ? 'Correct forms.' : `Correct forms: ${wordForTask.comparative} / ${wordForTask.superlative}.`);
+      const correct = comparative === normalizeAnswer(word.comparative) && superlative === normalizeAnswer(word.superlative);
+      finish(correct, correct ? 'Correct forms.' : `Correct forms: ${word.comparative} / ${word.superlative}.`);
     }
   };
   document.getElementById('adj-check')?.addEventListener('click', check);
