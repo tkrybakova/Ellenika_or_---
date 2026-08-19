@@ -1,13 +1,62 @@
-/* PRONOUNS hint — same placement as GENDERS / DECLENSION */
-.pronoun-exercise.f1-practice-card{position:relative!important;overflow:visible!important}
+/* PRONOUNS hint — force the same bottom-left placement as the practice UI */
 
-/* ? button: bottom-left of the exercise card */
-.pronoun-exercise .pronoun-hint-btn{position:absolute!important;left:18px!important;bottom:18px!important;right:auto!important;top:auto!important;z-index:50!important;width:42px!important;height:42px!important;min-width:42px!important;min-height:42px!important;margin:0!important;padding:0!important;border:1px solid #555a63!important;border-radius:50%!important;background:#17191e!important;color:#fff!important;font:900 18px Arial!important;line-height:40px!important;text-align:center!important;cursor:pointer!important;box-sizing:border-box!important}
-.pronoun-exercise .pronoun-hint-btn:hover{background:#e10600!important;border-color:#e10600!important}
+/* The exercise wrapper can vary between renderers, so do not depend on .pronoun-exercise. */
+.pronoun-hint-btn{
+  position:fixed!important;
+  left:18px!important;
+  bottom:18px!important;
+  right:auto!important;
+  top:auto!important;
+  z-index:10001!important;
+  width:42px!important;
+  height:42px!important;
+  min-width:42px!important;
+  min-height:42px!important;
+  margin:0!important;
+  padding:0!important;
+  border:1px solid #555a63!important;
+  border-radius:50%!important;
+  background:#17191e!important;
+  color:#fff!important;
+  font:900 18px Arial!important;
+  line-height:40px!important;
+  text-align:center!important;
+  cursor:pointer!important;
+  box-sizing:border-box!important;
+}
+.pronoun-hint-btn:hover{background:#e10600!important;border-color:#e10600!important}
 
-/* Hint itself: bottom-left, directly above ?; not centered */
-#pronoun-hint-overlay{position:fixed!important;inset:0!important;z-index:9999!important;display:block!important;padding:0!important;background:transparent!important;pointer-events:none!important}
-#pronoun-hint-overlay .pronoun-hint-modal{position:fixed!important;left:18px!important;bottom:70px!important;top:auto!important;right:auto!important;width:min(760px,calc(100vw - 36px))!important;max-width:none!important;max-height:min(62vh,560px)!important;overflow:auto!important;margin:0!important;padding:16px!important;background:#15171b!important;border:1px solid #35383f!important;border-left:3px solid #e10600!important;border-radius:10px!important;color:#ddd!important;box-shadow:0 18px 55px rgba(0,0,0,.65)!important;box-sizing:border-box!important;pointer-events:auto!important}
+/* Hint panel: bottom-left, directly above the ? button. */
+#pronoun-hint-overlay{
+  position:fixed!important;
+  inset:0!important;
+  z-index:10000!important;
+  display:block!important;
+  padding:0!important;
+  background:transparent!important;
+  pointer-events:none!important;
+}
+#pronoun-hint-overlay .pronoun-hint-modal{
+  position:fixed!important;
+  left:18px!important;
+  bottom:70px!important;
+  top:auto!important;
+  right:auto!important;
+  width:min(760px,calc(100vw - 36px))!important;
+  max-width:none!important;
+  max-height:min(62vh,560px)!important;
+  overflow:auto!important;
+  margin:0!important;
+  padding:16px!important;
+  background:#15171b!important;
+  border:1px solid #35383f!important;
+  border-left:3px solid #e10600!important;
+  border-radius:10px!important;
+  color:#ddd!important;
+  box-shadow:0 18px 55px rgba(0,0,0,.65)!important;
+  box-sizing:border-box!important;
+  pointer-events:auto!important;
+}
 #pronoun-hint-overlay .pronoun-hint-title{padding:0 38px 10px 2px!important;margin:0!important;color:#e10600!important;font:900 10px var(--mono)!important;letter-spacing:.14em!important}
 #pronoun-hint-overlay .pronoun-hint-close{position:absolute!important;right:8px!important;top:8px!important;width:30px!important;height:30px!important;min-width:30px!important;min-height:30px!important;margin:0!important;padding:0!important;background:#24262b!important;border:1px solid #393b42!important;border-radius:50%!important;color:#fff!important;font-size:20px!important;line-height:28px!important}
 #pronoun-hint-overlay .pronoun-hint-table{overflow-x:auto!important;margin:0!important}
@@ -16,7 +65,25 @@
 #pronoun-hint-overlay .pronoun-hint-table td,#pronoun-hint-overlay .pronoun-hint-table th{border:1px solid #30333a!important;padding:8px!important}
 
 @media(max-width:650px){
-  .pronoun-exercise .pronoun-hint-btn{left:14px!important;bottom:14px!important;width:40px!important;height:40px!important;min-width:40px!important;min-height:40px!important;line-height:38px!important}
-  #pronoun-hint-overlay .pronoun-hint-modal{left:14px!important;bottom:64px!important;width:calc(100vw - 28px)!important;max-height:58vh!important;padding:10px!important}
+  .pronoun-hint-btn{
+    left:14px!important;
+    bottom:14px!important;
+    top:auto!important;
+    right:auto!important;
+    width:40px!important;
+    height:40px!important;
+    min-width:40px!important;
+    min-height:40px!important;
+    line-height:38px!important;
+  }
+  #pronoun-hint-overlay .pronoun-hint-modal{
+    left:14px!important;
+    bottom:64px!important;
+    top:auto!important;
+    right:auto!important;
+    width:calc(100vw - 28px)!important;
+    max-height:58vh!important;
+    padding:10px!important;
+  }
   #pronoun-hint-overlay .pronoun-hint-table table{min-width:500px!important;font-size:11px!important}
 }
