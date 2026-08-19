@@ -18,6 +18,10 @@ function openDeclension() {
   renderPage('DECLENSION', renderLevelButtons(['easy', 'medium', 'hard'], 'startDeclension'), 'practice-page');
 }
 
+function openAdjectives() {
+  renderPage('THE ADJECTIVES', renderAdjectiveLevelButtons(), 'practice-page');
+}
+
 function emptyState(title, text) {
   return `
     <div class="empty-state">
