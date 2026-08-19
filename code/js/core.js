@@ -7,13 +7,17 @@ function escapeHtml(value){
 }
 
 function clearGameState(){
+  if(typeof currentGame!=='undefined')currentGame=null;
+  if(typeof currentDeclensionGame!=='undefined')currentDeclensionGame=null;
+  if(typeof genderTask!=='undefined')genderTask=null;
+  if(typeof adjectiveGame!=='undefined')adjectiveGame=null;
   window.currentGame=null;
   window.currentDeclensionGame=null;
   window.genderTask=null;
   window.adjectiveGame=null;
   if(typeof genderTimer!=='undefined')clearInterval(genderTimer);
   if(typeof adjectiveTimer!=='undefined')clearInterval(adjectiveTimer);
-  if(window.ellenikaDeclensionTimer)clearInterval(window.ellenikaDeclensionTimer);
+  if(typeof window.ellenikaDeclensionTimer!=='undefined')clearInterval(window.ellenikaDeclensionTimer);
 }
 
 function showScreen(id){
