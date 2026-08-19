@@ -1,9 +1,9 @@
 const content = document.getElementById('content');
 
-function clearGameState(){window.currentGame=null;window.currentDeclensionGame=null;window.genderTask=null;}
+function clearGameState(){window.currentGame=null;window.currentDeclensionGame=null;window.genderTask=null;window.adjectiveGame=null;}
 function showScreen(id){['home-screen','dashboard-screen','content-screen'].forEach(screenId=>{const el=document.getElementById(screenId);if(el)el.classList.toggle('hidden',screenId!==id);});}
 function showHome(){showScreen('home-screen');}
-function openGreekDashboard(){updateDashboardStats();showScreen('dashboard-screen');if(typeof renderDriverProgress==='function')renderDriverProgress();}
+function openGreekDashboard(){updateDashboardStats();showScreen('dashboard-screen');}
 function showLanguageMessage(language){alert(language+' is not available yet.');}
 function updateDashboardStats(){
   const vocabulary=document.getElementById('vocabulary-progress');
@@ -13,8 +13,6 @@ function updateDashboardStats(){
   if(vocabulary)vocabulary.textContent=`${learned}/${dictionary.length||0}`;
   if(genders)genders.textContent='50%';
   if(declension)declension.textContent='19%';
-  const count=document.getElementById('f1-unlock-count');
-  if(count&&typeof getUnlockedDrivers==='function')count.textContent=`${getUnlockedDrivers().length}/${F1_DRIVERS.length}`;
 }
 function renderPage(title,bodyHTML,extraClass=''){clearGameState();showScreen('content-screen');content.innerHTML=`<div class="page-heading"><div class="page-eyebrow">ELLENIKA / GREEK</div><h2>${title}</h2></div><div class="page-content ${extraClass}">${bodyHTML}</div>`;}
 function capitalize(str){return str.charAt(0).toUpperCase()+str.slice(1);}
