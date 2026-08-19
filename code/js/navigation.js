@@ -22,6 +22,10 @@ function openAdjectives() {
   renderPage('THE ADJECTIVES', renderLevelButtons(['easy', 'medium', 'hard'], 'startAdjective'), 'practice-page');
 }
 
+function openPronouns() {
+  renderPage('PRONOUNS', renderPronounSections(), 'practice-page');
+}
+
 function emptyState(title, text) {
   return `
     <div class="empty-state">
