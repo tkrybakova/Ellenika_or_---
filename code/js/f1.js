@@ -28,53 +28,6 @@ function getUnlockedDrivers(){
   return F1_DRIVERS.filter(driver => score >= driver.unlock);
 }
 
-function driverVisual(driver, open){
-  if(!open) return `<div class="driver-portrait locked-portrait"><span>?</span><small>LOCKED</small></div>`;
-  return `<div class="driver-portrait" style="--team-accent:${driver.accent}">
-    <div class="helmet"><span>${driver.code[0]}</span></div>
-    <div class="portrait-initials">${driver.code}</div>
-  </div>`;
-}
-
-function driverCard(driver, score){
-  const open = score >= driver.unlock;
-  return `<article class="f1-driver-card ${open?'unlocked':'locked'}" style="--team-accent:${driver.accent}">
-    ${driverVisual(driver, open)}
-    <div class="driver-number">#${driver.number}</div>
-    <div class="driver-meta">
-      <div class="driver-name">${driver.name}</div>
-      <div class="driver-team"><i></i>${driver.team}</div>
-      <span class="driver-status">${open ? '✓ UNLOCKED' : `${driver.unlock.toLocaleString()} PTS`}</span>
-    </div>
-  </article>`;
-}
-
-function renderDriverProgress(){
-  const score = typeof getScore === 'function' ? getScore() : 0;
-  const next = F1_DRIVERS.find(driver => score < driver.unlock);
-  const unlocked = getUnlockedDrivers().length;
-  const root = document.getElementById('f1-driver-progress');
-  if(!root) return;
-  const progress = next ? Math.max(0, Math.min(100, ((score - (F1_DRIVERS[F1_DRIVERS.indexOf(next)-1]?.unlock || 0)) / (next.unlock - (F1_DRIVERS[F1_DRIVERS.indexOf(next)-1]?.unlock || 0))) * 100)) : 100;
-  root.innerHTML = `
-    <div class="f1-progress-head">
-      <div><span class="f1-kicker">DRIVER UNLOCKS</span><h3>YOUR F1 GRID</h3></div>
-      <strong>${unlocked}/${F1_DRIVERS.length}</strong>
-    </div>
-    <div class="f1-progress-line"><span style="width:${progress}%"></span></div>
-    <div class="f1-next">${next ? `${(next.unlock-score).toLocaleString()} PTS TO UNLOCK · <b>${next.name}</b>` : 'FULL GRID UNLOCKED'}</div>
-    <div class="f1-driver-grid">${F1_DRIVERS.map(driver => driverCard(driver, score)).join('')}</div>`;
-}
-
-function renderDashboardDriverShowcase(){
-  const root = document.getElementById('f1-driver-progress');
-  if(!root) return;
-  const score = typeof getScore === 'function' ? getScore() : 0;
-  const unlocked = getUnlockedDrivers();
-  const visible = unlocked.length ? unlocked.slice(-3).reverse() : F1_DRIVERS.slice(0,3);
-  root.innerHTML = `<div class="dashboard-driver-header"><div><span class="f1-kicker">F1 DRIVER ACADEMY</span><h3>YOUR GARAGE</h3></div><button class="garage-button" onclick="openF1Drivers()">VIEW GRID →</button></div><div class="dashboard-driver-strip">${visible.map(driver => driverCard(driver, score)).join('')}</div>`;
-}
-
 function showF1BroadcastMessage(){
   const drivers = getUnlockedDrivers();
   if(!drivers.length) return;
@@ -100,9 +53,4 @@ function showF1BroadcastMessage(){
     root.classList.remove('show');
     setTimeout(()=>root.classList.add('hidden'),350);
   },6000);
-}
-
-function openF1Drivers(){
-  renderPage('F1 / DRIVERS', '<div id="f1-driver-progress"></div>', 'f1-page');
-  renderDriverProgress();
 }
