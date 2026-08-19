@@ -14,13 +14,19 @@ const FINAL_ADJECTIVES = [
   { positive:'ωραίος', comparative:'ωραιότερος', superlative:'ωραιότατος', meaning:'beautiful / nice', comparativeEnding:'-ότερος' }
 ];
 
+// The old compatibility layer rendered the NEXT button as active before an answer.
+// Keep it disabled/hidden until the current task has been checked.
+function renderFixedResultArea(nextLabel,nextAction){
+  return `<div id="practice-result" class="practice-result" aria-live="polite"></div><button id="next-practice-btn" class="next-action" disabled style="display:none">${escapeHtml(nextLabel)}</button>`;
+}
+
 function finishFinalPractice({section,level,correct,message,next}){
   recordGrammarAnswer(section,correct);
   if(correct&&typeof addScore==='function')addScore(PRACTICE_POINTS[level]||10);
   const result=document.getElementById('practice-result');
   if(result){result.className=correct?'correct practice-result':'wrong practice-result';result.textContent=`${correct?'✓':'✕'} ${message}${correct?`  +${PRACTICE_POINTS[level]||10} pts`:''}`;}
   const button=document.getElementById('next-practice-btn');
-  if(button){button.disabled=false;button.textContent=next.label;button.onclick=next.action;}
+  if(button){button.disabled=false;button.style.display='block';button.textContent=next.label;button.onclick=next.action;}
 }
 
 function finalPracticeShell(title,level,progress,task,nextLabel,nextAction){
@@ -35,7 +41,6 @@ function startAdjective(level='easy'){
   adjectiveLevel=level;
   const word=FINAL_ADJECTIVES[Math.floor(Math.random()*FINAL_ADJECTIVES.length)];
   const labels={easy:['EASY','01 / 03'],medium:['MEDIUM','02 / 03'],hard:['HARD','03 / 03']};
-  const [name,number]=labels[level]||labels.easy;
   let target=null;
   let task='';
 
@@ -72,8 +77,7 @@ function startAdjective(level='easy'){
     const check=()=>{
       const answer=normalizeAnswer(document.getElementById('adj-ending')?.value);
       if(!answer)return;
-      const expected=normalizeAnswer(word.comparativeEnding);
-      const correct=answer===expected;
+      const correct=answer===normalizeAnswer(word.comparativeEnding);
       finish(correct,correct?`Correct ending: ${word.comparativeEnding}.`:`Correct ending: ${word.comparativeEnding}.`);
     };
     document.getElementById('adj-check').onclick=check;
@@ -96,11 +100,8 @@ function startAdjective(level='easy'){
 
 // ---------------- PRONOUNS ----------------
 let fixedPronounTarget=null;
-
 function pronounCaseLabel(index){return ['Nominative','Possessive','Accusative','Vocative'][index]||`Case ${index+1}`;}
-function pronounCellVariants(value){
-  return String(value||'').split('/').map(v=>normalizeAnswer(v.replace(/[()]/g,''))).filter(Boolean);
-}
+function pronounCellVariants(value){return String(value||'').split('/').map(v=>normalizeAnswer(v.replace(/[()]/g,''))).filter(Boolean);}
 function pronounCellCorrect(answer,expected){
   const a=normalizeAnswer(answer);
   if(!a)return false;
@@ -156,9 +157,8 @@ function startPronoun(level='easy'){
   if(!rows.length){renderPage('PRONOUNS',emptyState('PRONOUNS is not ready','This section has no declension data.'),'practice-page');return;}
   fixedPronounTarget={mode:'table',rows};
   const caseCount=Math.min(rows.length,4);
-  const cases=Array.from({length:caseCount},(_,i)=>pronounCaseLabel(i));
-  const headings=pronounSection.cases&&pronounSection.cases.length===3?pronounSection.cases:['Masculine','Feminine','Neuter'];
-  const cells=rows.slice(0,caseCount).map((row,r)=>`<div class="pronoun-case-row"><strong>${cases[r]}</strong>${row.slice(0,3).map((value,c)=>`<label><span>${escapeHtml(headings[c])}</span><input id="pronoun-${r}-${c}" value="" autocomplete="off" spellcheck="false" placeholder="${escapeHtml(headings[c])}"></label>`).join('')}</div>`).join('');
+  const headings=['Masculine','Feminine','Neuter'];
+  const cells=rows.slice(0,caseCount).map((row,r)=>`<div class="pronoun-case-row"><strong>${pronounCaseLabel(r)}</strong>${row.slice(0,3).map((value,c)=>`<label><span>${headings[c]}</span><input id="pronoun-${r}-${c}" autocomplete="off" spellcheck="false" placeholder="${headings[c]}"></label>`).join('')}</div>`).join('');
   const task=`<div class="pronoun-prompt">WRITE THE DECLENSION BY CASE AND GENDER</div><div class="pronoun-word">${escapeHtml(pronounQuestion[0])}</div><div class="pronoun-grid pronoun-declension-grid">${cells}</div><button class="check-action" id="fixed-pronoun-check">CHECK</button>${pronounHintButton('hard')}`;
   renderPage('PRONOUNS',`<div class="pronoun-exercise f1-practice-card">${finalPracticeShell(pronounSection.title,'hard',100,task,'NEXT →',()=>startPronoun('hard'))}</div>`,'practice-page');
 
