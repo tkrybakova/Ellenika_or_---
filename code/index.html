@@ -22,7 +22,6 @@
       <div class="choose-language" aria-hidden="true"><span>LIGHTS</span><span>OUT</span></div>
       <div class="home-footer">YOUR LANGUAGE · YOUR LAP · YOUR POINTS <span>•</span> ELLENIKA</div>
     </section>
-
     <section id="dashboard-screen" class="dashboard-screen hidden" aria-label="Greek dashboard">
       <button class="back-button" onclick="showHome()" aria-label="Back">←</button>
       <div class="dashboard-content">
@@ -38,24 +37,16 @@
         <div id="f1-driver-progress"></div>
       </div>
     </section>
-
     <section id="content-screen" class="content-screen hidden" aria-live="polite">
       <button class="back-button content-back" onclick="openGreekDashboard()" aria-label="Back to Greek dashboard">←</button>
       <div id="content"></div>
     </section>
-
     <aside id="f1-broadcast" class="f1-broadcast hidden" aria-live="polite" aria-label="F1 live broadcast message"></aside>
-
     <aside id="study-tools" class="study-tools" aria-label="Study timer and score">
-      <div class="study-tool timer-tool">
-        <span class="tool-label">FOCUS</span>
-        <strong id="study-timer-display">30:00</strong>
-        <div class="timer-actions"><button id="study-timer-toggle" onclick="toggleStudyTimer()">Start</button><button onclick="resetStudyTimer()" aria-label="Reset timer">↻</button></div>
-      </div>
+      <div class="study-tool timer-tool"><span class="tool-label">FOCUS</span><strong id="study-timer-display">30:00</strong><div class="timer-actions"><button id="study-timer-toggle" onclick="toggleStudyTimer()">Start</button><button onclick="resetStudyTimer()" aria-label="Reset timer">↻</button></div></div>
       <div class="study-tool score-tool"><span class="tool-label">CHAMPIONSHIP POINTS</span><strong id="study-score">0 pts</strong></div>
     </aside>
   </main>
-
   <script src="js/storage.js"></script>
   <script src="js/core.js"></script>
   <script src="js/dictionary.js"></script>
@@ -70,8 +61,7 @@
   <script src="js/f1.js"></script>
   <script src="js/fixes.js"></script>
   <script src="js/fixes2.js"></script>
-  <script>
-    loadWords().then(() => initStudyTools());
-  </script>
+  <script src="js/fixes3.js"></script>
+  <script>loadWords().then(() => initStudyTools());</script>
 </body>
 </html>
