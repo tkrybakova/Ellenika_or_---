@@ -13,6 +13,7 @@ function updateDashboardStats(){
   if(vocabulary)vocabulary.textContent=`${learned}/${dictionary.length||0}`;
   if(genders)genders.textContent='50%';
   if(declension)declension.textContent='19%';
+  if(typeof renderDriverProgress==='function')renderDriverProgress();
 }
 function renderPage(title,bodyHTML,extraClass=''){clearGameState();showScreen('content-screen');content.innerHTML=`<div class="page-heading"><div class="page-eyebrow">ELLENIKA / GREEK</div><h2>${title}</h2></div><div class="page-content ${extraClass}">${bodyHTML}</div>`;}
 function capitalize(str){return str.charAt(0).toUpperCase()+str.slice(1);}
