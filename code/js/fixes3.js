@@ -21,8 +21,7 @@
   window.getPracticeVocabulary=practiceWords;
 
   // Remove audio buttons from Personal Pronouns hints without replacing
-  // the original Pronouns rendering functions. Replacing them caused the
-  // selected exercise to disappear because pronounSection is module-local.
+  // the original Pronouns rendering functions.
   function plainPronounHint(html){
     if(!html)return '';
     return String(html).replace(/<button[^>]*class=["']pronoun-audio["'][^>]*>([\s\S]*?)<\/button>/gi,'$1');
@@ -35,6 +34,18 @@
     personal.hintEasy=plainPronounHint(personal.hintEasy);
     personal.hintHard=plainPronounHint(personal.hintHard);
   }
+
+  // Pronouns use the same clean page structure as Genders/Declension:
+  // renderPage already supplies the PRONOUNS heading, so do not render it again.
+  window.renderPronounSections=function(){
+    return `<div class="pronouns-page"><div class="pronoun-section-list">${PRONOUN_SECTIONS.map((s,i)=>`<button class="pronoun-section-row" onclick="openPronounSection('${s.id}')"><span class="pronoun-number">${String(i+1).padStart(2,'0')}</span><span class="pronoun-section-main"><b>${s.title}</b><small>${s.greek}</small></span><span class="pronoun-section-modes">EASY · HARD</span><i>→</i></button>`).join('')}</div></div>`;
+  };
+
+  window.renderPronounModes=function(){
+    const s=pronounSection;
+    if(!s)return '';
+    return `<div class="pronouns-page pronoun-level-page"><div class="pronoun-section-breadcrumb">PRONOUNS / ${s.title}</div>${renderLevelButtons(['easy','hard'],'startPronoun')}</div>`;
+  };
 
   syncPersonalHints();
 })();
