@@ -52,3 +52,55 @@ function normalizePronoun(v){return String(v||'').trim().toLowerCase().replace(/
 function checkPronounEasy(btn,answer){if(pronounAnswered)return;pronounAnswered=true;const correct=normalizePronoun(answer)===normalizePronoun(pronounQuestion[1]);document.querySelectorAll('.pronoun-option').forEach(b=>b.disabled=true);btn.classList.add(correct?'correct':'wrong');if(correct){addStudyPoints(10);if(typeof showF1Broadcast==='function')showF1Broadcast('Great call — keep the pace!');}else{document.querySelectorAll('.pronoun-option').forEach(b=>{if(normalizePronoun(b.textContent)===normalizePronoun(pronounQuestion[1]))b.classList.add('answer-reveal');});}}
 function checkPronounHard(){if(pronounAnswered)return;const q=pronounHardQuestion;if(!q){return checkGenericPronounHard();}const cells=q.rows.map((_,i)=>document.getElementById(`pronoun-cell-${i}`));const values=cells.map(x=>normalizePronoun(x?.value));const expected=q.rows.map(r=>normalizePronoun(r[1]));const ok=values.every((v,i)=>v===expected[i]||(expected[i]==='—'&&v===''));const result=document.getElementById('pronoun-result');pronounAnswered=true;cells.forEach(x=>x.disabled=true);const check=document.getElementById('pronoun-check');if(check)check.disabled=true;result.textContent=ok?'CORRECT · +20 PTS':`CHECK AGAIN · ${q.rows.map(r=>r[1]).join(' · ')}`;result.className='pronoun-result '+(ok?'correct':'wrong');if(ok){addStudyPoints(20);if(typeof showF1Broadcast==='function')showF1Broadcast('Clean lap. Keep pushing!');}}
 function checkGenericPronounHard(){const s=pronounSection;const rows=s.table||[];const row=rows[Math.floor(Math.random()*rows.length)];const cells=s.cases.map((_,i)=>document.getElementById(`pronoun-cell-${i}`));const values=cells.map(x=>normalizePronoun(x?.value));const expected=row.slice(0,cells.length).map(normalizePronoun);const ok=values.every((v,i)=>v===expected[i]||(expected[i]==='—'&&v===''));const result=document.getElementById('pronoun-result');pronounAnswered=true;cells.forEach(x=>x.disabled=true);const check=document.getElementById('pronoun-check');if(check)check.disabled=true;result.textContent=ok?'CORRECT · +20 PTS':`CHECK AGAIN · Example: ${row.join(' · ')}`;result.className='pronoun-result '+(ok?'correct':'wrong');if(ok){addStudyPoints(20);if(typeof showF1Broadcast==='function')showF1Broadcast('Clean lap. Keep pushing!');}}
+
+// ============================================================
+// PRONOUNS DESIGN — same card structure and visual language as GENDERS
+// ============================================================
+function pronounStyles(){
+  if(document.getElementById('pronoun-redesign-style'))return;
+  const s=document.createElement('style');
+  s.id='pronoun-redesign-style';
+  s.textContent=`
+.pronoun-exercise{max-width:820px!important;margin:0 auto!important;background:#101216!important;border:1px solid #34373e!important;border-radius:18px!important;padding:0!important;overflow:hidden!important;box-shadow:0 18px 50px rgba(0,0,0,.28)!important;display:flex!important;flex-direction:column!important;position:relative!important}
+.pronoun-exercise .exercise-top{display:flex!important;align-items:center!important;gap:10px!important;min-height:58px!important;padding:14px 18px!important;background:linear-gradient(90deg,#17191e,#111216)!important;border-bottom:1px solid #2c2f35!important;color:#858992!important;font:800 10px var(--mono)!important;letter-spacing:.12em!important;order:1!important}
+.pronoun-exercise .exercise-top>span:nth-child(2){margin-left:auto!important;color:#fff!important}
+.pronoun-exercise .progress-track{height:4px!important;margin:0!important;background:#292c31!important;order:2!important}
+.pronoun-exercise .progress-track i{display:block!important;height:100%!important;background:#e10600!important}
+.pronoun-exercise .pronoun-prompt{margin:34px 24px 8px!important;color:#e10600!important;font:800 10px var(--mono)!important;letter-spacing:.18em!important;text-transform:uppercase!important;order:3!important}
+.pronoun-exercise .pronoun-word{margin:0 24px 20px!important;color:#fff!important;font:900 clamp(42px,10vw,76px)/1 Arial!important;font-style:italic!important;letter-spacing:-.04em!important;text-align:center!important;order:4!important}
+.pronoun-exercise .pronoun-options{display:grid!important;grid-template-columns:repeat(3,1fr)!important;gap:8px!important;margin:0 18px 18px!important;order:5!important}
+.pronoun-exercise .pronoun-option{min-height:108px!important;margin:0!important;padding:14px 8px!important;background:#1a1c21!important;border:1px solid #363941!important;border-radius:12px!important;color:#fff!important;display:flex!important;align-items:center!important;justify-content:center!important;font:900 16px Arial!important;cursor:pointer!important;transition:.15s!important}
+.pronoun-exercise .pronoun-option:hover{background:#e10600!important;border-color:#e10600!important;transform:translateY(-2px)!important}
+.pronoun-exercise .pronoun-grid{display:grid!important;grid-template-columns:1fr 1fr!important;gap:8px!important;margin:0 18px 8px!important;order:5!important}
+.pronoun-exercise .pronoun-grid label{color:#858992!important;font:800 9px var(--mono)!important;text-transform:uppercase!important}
+.pronoun-exercise .pronoun-grid input{box-sizing:border-box!important;width:100%!important;height:52px!important;margin-top:6px!important;border-radius:10px!important;background:#191b20!important;border:1px solid #3a3d45!important;color:#fff!important;padding:0 14px!important}
+.pronoun-exercise .check-action{height:52px!important;width:calc(100% - 36px)!important;margin:0 18px 10px!important;border-radius:10px!important;background:#e10600!important;border:0!important;color:#fff!important;padding:0 22px!important;font:900 11px var(--mono)!important;text-transform:uppercase!important;order:6!important}
+.pronoun-exercise .pronoun-result{margin:0 18px 10px!important;border-radius:10px!important;order:7!important}
+.pronoun-exercise .next-action{display:block!important;width:calc(100% - 36px)!important;margin:0 18px 20px!important;border-radius:10px!important;background:#e10600!important;color:#fff!important;font:900 11px var(--mono)!important;text-transform:uppercase!important;order:9!important}
+.pronoun-exercise .pronoun-hint-btn{position:static!important;left:auto!important;top:auto!important;right:auto!important;bottom:auto!important;width:44px!important;height:44px!important;margin:0 18px 10px!important;border-radius:50%!important;background:#1b1d22!important;border:1px solid #464951!important;color:#fff!important;font:900 18px Arial!important;cursor:pointer!important;order:8!important;align-self:flex-start!important}
+.pronoun-exercise .pronoun-hint-btn:hover{background:#e10600!important;border-color:#e10600!important}
+.pronoun-exercise #pronoun-hint-overlay{position:static!important;inset:auto!important;display:block!important;width:auto!important;height:auto!important;order:10!important;margin:0 18px 20px!important;background:none!important;z-index:auto!important}
+.pronoun-exercise .pronoun-hint-modal{position:static!important;inset:auto!important;transform:none!important;width:100%!important;max-width:none!important;box-sizing:border-box!important;margin:0!important;padding:14px!important;background:#15171b!important;border:1px solid #35383f!important;border-radius:12px!important;color:#ddd!important;box-shadow:0 15px 35px rgba(0,0,0,.55)!important;overflow-x:auto!important}
+.pronoun-exercise .pronoun-hint-close{display:none!important}
+.pronoun-exercise .pronoun-hint-title{margin:0 0 10px!important;color:#e10600!important;font:800 10px var(--mono)!important;letter-spacing:.14em!important}
+.pronoun-exercise .pronoun-hint-table{width:100%!important;overflow-x:auto!important}
+.pronoun-exercise .pronoun-hint-table table{width:100%!important;min-width:500px!important;border-collapse:collapse!important;color:#ddd!important}
+.pronoun-exercise .pronoun-hint-table th{background:#202329!important;color:#e10600!important;border:1px solid #30333a!important;padding:8px!important}
+.pronoun-exercise .pronoun-hint-table td{border:1px solid #30333a!important;padding:8px!important;color:#ddd!important}
+.pronoun-exercise .pronoun-hint-table h4{margin:0 0 10px!important;color:#fff!important;font:800 11px var(--mono)!important}
+.pronoun-exercise .pronoun-hint-table .hint-note{color:#858992!important;font-size:11px!important}
+.pronoun-exercise .pronoun-audio{background:none!important;border:0!important;color:#fff!important;padding:0!important;font:inherit!important;cursor:pointer!important}
+@media(max-width:650px){
+  .pronoun-exercise{width:100%!important;border-radius:14px!important}
+  .pronoun-exercise .exercise-top{padding:12px 14px!important;font-size:8px!important}
+  .pronoun-exercise .pronoun-prompt{margin-top:28px!important}
+  .pronoun-exercise .pronoun-word{font-size:48px!important}
+  .pronoun-exercise .pronoun-options{grid-template-columns:1fr!important}
+  .pronoun-exercise .pronoun-option{min-height:72px!important;justify-content:flex-start!important;padding-left:22px!important}
+  .pronoun-exercise .pronoun-grid{grid-template-columns:1fr!important}
+  .pronoun-exercise .pronoun-hint-table{font-size:11px!important}
+}
+`;
+  document.head.appendChild(s);
+}
+pronounStyles();
