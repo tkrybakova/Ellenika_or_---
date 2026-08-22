@@ -255,12 +255,6 @@ function backToVocabularyLevel(level) {
   if (list) list.innerHTML = renderSelectedLevel();
 }
 
-function escapeHtml(value) {
-  return String(value ?? '').replace(/[&<>'"]/g, char => ({
-    '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;'
-  }[char]));
-}
-
 function deleteWord(index) {
   if (!confirm(`Delete “${dictionary[index].greek}”?`)) return;
   dictionary.splice(index, 1);
