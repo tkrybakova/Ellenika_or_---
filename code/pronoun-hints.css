@@ -26,8 +26,7 @@
 }
 .pronoun-exercise .pronoun-hint-btn:hover{background:#e10600!important;border-color:#e10600!important}
 
-/* Hint is positioned relative to the exercise card, NOT the viewport.
-   It opens below the ? button, as requested. */
+/* Hint is positioned relative to the exercise card, NOT the viewport. */
 #pronoun-hint-overlay{
   position:absolute!important;
   left:0!important;
@@ -68,6 +67,11 @@
 #pronoun-hint-overlay .pronoun-hint-table table{width:100%!important;border-collapse:collapse!important;min-width:520px!important}
 #pronoun-hint-overlay .pronoun-hint-table th{background:#202329!important;color:#e10600!important}
 #pronoun-hint-overlay .pronoun-hint-table td,#pronoun-hint-overlay .pronoun-hint-table th{border:1px solid #30333a!important;padding:8px!important}
+
+/* Used by the hint content generated in pronouns.js. */
+#pronoun-hint-overlay .pronoun-audio{color:#fff;text-decoration:none;border-bottom:1px dotted #e10600;background:none;border-top:0;border-left:0;border-right:0;padding:0;cursor:pointer;font:inherit}
+#pronoun-hint-overlay .pronoun-audio:hover{color:#e10600}
+#pronoun-hint-overlay .hint-note{margin:10px 0 0;color:#858992;font:500 11px Arial}
 
 @media(max-width:650px){
   .pronoun-exercise .pronoun-hint-btn{left:14px!important;bottom:14px!important;width:40px!important;height:40px!important;min-width:40px!important;min-height:40px!important;line-height:38px!important}
