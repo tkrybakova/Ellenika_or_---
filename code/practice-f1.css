@@ -1,4 +1,4 @@
-/* F1 practice visual system — overrides legacy practice styling */
+/* F1 practice visual system — single override layer for practice selectors/cards */
 .practice-page{max-width:980px!important;margin:0 auto!important;padding:18px!important}
 .practice-page .page-content,.practice-page .practice-selector{max-width:900px!important;margin:0 auto!important}
 .practice-page .practice-selector{background:#101216!important;border:1px solid #30343b!important;border-radius:16px!important;overflow:hidden!important;box-shadow:0 16px 42px rgba(0,0,0,.28)!important}
@@ -20,7 +20,6 @@
 .practice-page .level-tab>i{font-style:normal!important;font:900 17px Arial!important;color:#777c85!important}
 .practice-page .level-tab:hover>i{color:#fff!important}
 
-/* Both exercise types use the same race-card language. */
 .gender-redesign,.declension-redesign{max-width:900px!important;margin:18px auto!important}
 .gender-redesign .exercise-shell,.declension-redesign .exercise-shell{background:#101216!important;border:1px solid #30343b!important;border-radius:16px!important;overflow:hidden!important;box-shadow:0 16px 42px rgba(0,0,0,.28)!important}
 .gender-redesign .exercise-top,.declension-redesign .exercise-top{background:linear-gradient(90deg,#191b20,#101216)!important;border-bottom:1px solid #30343b!important}
@@ -42,4 +41,10 @@
  .practice-page .level-tab>strong{font-size:9px!important}
  .practice-page .selector-head{padding:15px!important}
  .gender-redesign,.declension-redesign{margin:10px auto!important}
+}
+
+@media(max-width:380px){
+ .practice-page .level-tab{min-height:62px!important;grid-template-columns:25px 1fr 15px!important;padding:10px 12px 10px 17px!important}
+ .practice-page .level-tab>strong{display:none!important}
+ .practice-page .level-tab>i{font-size:15px!important}
 }
