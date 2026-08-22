@@ -6,16 +6,16 @@
 // ============================================================
 
 const ADJECTIVES = [
-  { positive:'καλός', comparative:'καλύτερος', superlative:'καλύτερος', meaning:'good / well', ending:'-ός' },
-  { positive:'μεγάλος', comparative:'μεγαλύτερος', superlative:'μεγαλύτερος', meaning:'big / large', ending:'-ος' },
-  { positive:'μικρός', comparative:'μικρότερος', superlative:'μικρότερος', meaning:'small', ending:'-ός' },
-  { positive:'γρήγορος', comparative:'γρηγορότερος', superlative:'γρηγορότερος', meaning:'fast', ending:'-ος' },
-  { positive:'αργός', comparative:'αργότερος', superlative:'αργότερος', meaning:'slow', ending:'-ός' },
-  { positive:'εύκολος', comparative:'ευκολότερος', superlative:'ευκολότερος', meaning:'easy', ending:'-ος' },
-  { positive:'δύσκολος', comparative:'δυσκολότερος', superlative:'δυσκολότερος', meaning:'difficult', ending:'-ος' },
-  { positive:'ψηλός', comparative:'ψηλότερος', superlative:'ψηλότερος', meaning:'tall / high', ending:'-ός' },
-  { positive:'χαμηλός', comparative:'χαμηλότερος', superlative:'χαμηλότερος', meaning:'low', ending:'-ός' },
-  { positive:'ωραίος', comparative:'ωραιότερος', superlative:'ωραιότερος', meaning:'beautiful / nice', ending:'-ος' }
+  { positive:'καλός', comparative:'καλύτερος', superlative:'ο καλύτερος', meaning:'good / well', ending:'-ός' },
+  { positive:'μεγάλος', comparative:'μεγαλύτερος', superlative:'ο μεγαλύτερος', meaning:'big / large', ending:'-ος' },
+  { positive:'μικρός', comparative:'μικρότερος', superlative:'ο μικρότερος', meaning:'small', ending:'-ός' },
+  { positive:'γρήγορος', comparative:'γρηγορότερος', superlative:'ο γρηγορότερος', meaning:'fast', ending:'-ος' },
+  { positive:'αργός', comparative:'αργότερος', superlative:'ο αργότερος', meaning:'slow', ending:'-ός' },
+  { positive:'εύκολος', comparative:'ευκολότερος', superlative:'ο ευκολότερος', meaning:'easy', ending:'-ος' },
+  { positive:'δύσκολος', comparative:'δυσκολότερος', superlative:'ο δυσκολότερος', meaning:'difficult', ending:'-ος' },
+  { positive:'ψηλός', comparative:'ψηλότερος', superlative:'ο ψηλότερος', meaning:'tall / high', ending:'-ός' },
+  { positive:'χαμηλός', comparative:'χαμηλότερος', superlative:'ο χαμηλότερος', meaning:'low', ending:'-ός' },
+  { positive:'ωραίος', comparative:'ωραιότερος', superlative:'ο ωραιότερος', meaning:'beautiful / nice', ending:'-ος' }
 ];
 
 let adjectiveGame = null;
@@ -154,22 +154,36 @@ function startAdjectiveTimer(){
   adjectiveTimeLeft=60;
   const update=()=>{const el=document.getElementById('adjective-timer');if(!el)return;el.textContent=`${Math.floor(adjectiveTimeLeft/60)}:${String(adjectiveTimeLeft%60).padStart(2,'0')}`;el.style.color=adjectiveTimeLeft<=15?'#e10600':''};
   update();
-  adjectiveTimer=setInterval(()=>{adjectiveTimeLeft--;update();if(adjectiveTimeLeft<=0){clearInterval(adjectiveTimer);if(adjectiveGame&&!adjectiveGame.answered)adjectiveGame.finish(false,"Time's up.")}},1000);
+  adjectiveTimer=setInterval(()=>{
+    if(document.getElementById('adjective-result')){
+      clearInterval(adjectiveTimer);
+      adjectiveTimer=null;
+      return;
+    }
+    adjectiveTimeLeft--;
+    update();
+    if(adjectiveTimeLeft<=0){
+      clearInterval(adjectiveTimer);
+      adjectiveTimer=null;
+      if(adjectiveGame&&!document.getElementById('adjective-result'))adjectiveGame.finish(false,"Time's up.");
+    }
+  },1000);
 }
 
 function createAdjectiveGame(word,level){
   let answered=false;
   const points=level==='easy'?10:level==='medium'?15:20;
-  function finish(correct,message){if(answered)return;answered=true;clearInterval(adjectiveTimer);if(correct&&typeof addScore==='function')addScore(points);const old=document.getElementById('adjective-result');if(old)old.remove();const el=document.createElement('div');el.id='adjective-result';el.className='adj-result';el.textContent=(correct?'✓ ':'! ')+message+(correct?`  +${points} pts`:'');document.getElementById('content').appendChild(el);if(typeof registerPracticeAnswer==='function')registerPracticeAnswer();const next=document.createElement('button');next.className='next-action';next.textContent='Next adjective →';next.onclick=()=>startAdjective(level);document.getElementById('content').appendChild(next)}
+  function finish(correct,message){if(answered)return;answered=true;clearInterval(adjectiveTimer);adjectiveTimer=null;if(correct&&typeof addScore==='function')addScore(points);const old=document.getElementById('adjective-result');if(old)old.remove();const el=document.createElement('div');el.id='adjective-result';el.className='adj-result';el.textContent=(correct?'✓ ':'! ')+message+(correct?`  +${points} pts`:'');document.getElementById('content').appendChild(el);if(typeof registerPracticeAnswer==='function')registerPracticeAnswer();const next=document.createElement('button');next.className='next-action';next.textContent='Next adjective →';next.onclick=()=>startAdjective(level);document.getElementById('content').appendChild(next)}
   function checkDegree(answer){const degree=answer===word.positive?'Positive Degree':answer===word.comparative?'Comparative Degree':'Superlative Degree';finish(answer===word.positive||answer===word.comparative||answer===word.superlative,answer===word.positive||answer===word.comparative||answer===word.superlative?`Correct: ${degree}.`:`Correct degree: Positive / Comparative / Superlative.`)}
   function checkEnding(){const input=document.getElementById('adjective-ending');finish(input&&input.value.trim().toLowerCase()===word.ending.toLowerCase(),`Correct ending: ${word.ending}.`)}
   function checkForms(){const c=document.getElementById('adjective-comparative').value.trim().toLowerCase();const s=document.getElementById('adjective-superlative').value.trim().toLowerCase();finish(c===word.comparative.toLowerCase()&&s===word.superlative.toLowerCase(),`Correct forms: ${word.comparative} / ${word.superlative}.`)}
   function render(){adjectiveStyles();const timer=`<div class="adj-timer"><span>TIME</span><strong id="adjective-timer">1:00</strong></div>`;let html='';if(level==='easy'){const options=[word.positive,word.comparative,word.superlative].sort(()=>Math.random()-.5);html=`<div class="adjective-redesign"><div class="exercise-shell"><div class="exercise-top"><span>ADJECTIVES / EASY</span><span>01 / 03</span>${timer}</div><div class="progress-track"><i style="width:33%"></i></div><div class="adj-prompt">IDENTIFY THE DEGREE</div><div class="adj-word">${options[0]}</div><div class="adj-meaning">${word.meaning}</div><div class="adj-options">${[['Positive Degree',word.positive],['Comparative Degree',word.comparative],['Superlative Degree',word.superlative]].map(([label,val])=>`<button class="adj-option" onclick="adjectiveGame.checkDegree('${val}')">${label}</button>`).join('')}</div>${renderAdjectiveHint()}</div></div>`}else if(level==='medium'){const stem=word.positive.slice(0,-word.ending.length);html=`<div class="adjective-redesign"><div class="exercise-shell"><div class="exercise-top"><span>ADJECTIVES / MEDIUM</span><span>02 / 03</span>${timer}</div><div class="progress-track"><i style="width:66%"></i></div><div class="adj-prompt">WRITE THE ENDING</div><div class="adj-word">${stem}___</div><div class="adj-meaning">${word.meaning} · Complete the adjective</div><div class="adj-input"><input id="adjective-ending" placeholder="Ending"><button class="check-action" onclick="adjectiveGame.checkEnding()">CHECK</button></div>${renderAdjectiveHint()}</div></div>`}else{html=`<div class="adjective-redesign"><div class="exercise-shell"><div class="exercise-top"><span>ADJECTIVES / HARD</span><span>03 / 03</span>${timer}</div><div class="progress-track"><i style="width:100%"></i></div><div class="adj-prompt">WRITE BOTH DEGREES</div><div class="adj-word">${word.positive}</div><div class="adj-meaning">${word.meaning}</div><div class="adj-hard"><label>Comparative Degree<input id="adjective-comparative" placeholder="Comparative"></label><label>Superlative Degree<input id="adjective-superlative" placeholder="Superlative"></label></div><button class="check-action" style="width:calc(100% - 36px);margin:0 18px 18px" onclick="adjectiveGame.checkForms()">CHECK ANSWER</button>${renderAdjectiveHint()}</div></div>`}document.getElementById('content').innerHTML=html;startAdjectiveTimer();document.querySelectorAll('#content input').forEach(i=>i.addEventListener('keydown',e=>{if(e.key==='Enter')document.querySelector('#content .check-action')?.click()}))}
-  return {render,checkDegree,checkEnding,checkForms,finish,answered:false};
+  return {render,checkDegree,checkEnding,checkForms,finish,get answered(){return answered;}};
 }
 
 function startAdjective(level){
   clearInterval(adjectiveTimer);
+  adjectiveTimer=null;
   adjectiveLevel=level;
   const word=ADJECTIVES[Math.floor(Math.random()*ADJECTIVES.length)];
   adjectiveGame=createAdjectiveGame(word,level);
