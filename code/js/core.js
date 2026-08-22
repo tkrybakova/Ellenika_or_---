@@ -11,12 +11,15 @@ function clearGameState(){
   if(typeof currentDeclensionGame!=='undefined')currentDeclensionGame=null;
   if(typeof genderTask!=='undefined')genderTask=null;
   if(typeof adjectiveGame!=='undefined')adjectiveGame=null;
+  if(typeof currentPronounGame!=='undefined')currentPronounGame=null;
   window.currentGame=null;
   window.currentDeclensionGame=null;
   window.genderTask=null;
   window.adjectiveGame=null;
+  window.currentPronounGame=null;
   if(typeof genderTimer!=='undefined')clearInterval(genderTimer);
   if(typeof adjectiveTimer!=='undefined')clearInterval(adjectiveTimer);
+  if(typeof pronounTimer!=='undefined')clearInterval(pronounTimer);
   if(typeof window.ellenikaDeclensionTimer!=='undefined')clearInterval(window.ellenikaDeclensionTimer);
 }
 
@@ -30,6 +33,58 @@ function showHome(){showScreen('home-screen');}
 function openGreekDashboard(){updateDashboardStats();showScreen('dashboard-screen');}
 function showLanguageMessage(language){alert(language+' is not available yet.');}
 
+function getDailyMissionDate(){
+  const now=new Date();
+  return `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}-${String(now.getDate()).padStart(2,'0')}`;
+}
+
+function getDailyMissionState(){
+  const today=getDailyMissionDate();
+  const storedDate=localStorage.getItem('ellenikaDailyMissionDate');
+  if(storedDate!==today){
+    localStorage.setItem('ellenikaDailyMissionDate',today);
+    localStorage.setItem('ellenikaDailyMissionStartScore',String(typeof getScore==='function'?getScore():0));
+    localStorage.setItem('ellenikaDailyMissionClaimed','0');
+  }
+  const startScore=Number(localStorage.getItem('ellenikaDailyMissionStartScore')||0);
+  const currentScore=typeof getScore==='function'?getScore():0;
+  return {target:50,earned:Math.max(0,currentScore-startScore),claimed:localStorage.getItem('ellenikaDailyMissionClaimed')==='1'};
+}
+
+function checkDailyMission(){
+  const state=getDailyMissionState();
+  if(state.earned>=state.target&&!state.claimed){
+    localStorage.setItem('ellenikaDailyMissionClaimed','1');
+    if(typeof addScore==='function')addScore(50);
+    state.claimed=true;
+    if(typeof showF1BroadcastMessage==='function')showF1BroadcastMessage();
+  }
+  return state;
+}
+
+function updateDailyMission(){
+  const root=document.getElementById('daily-mission');
+  if(!root)return;
+  const state=checkDailyMission();
+  const percent=Math.min(100,Math.round(state.earned/state.target*100));
+  root.innerHTML=`
+    <section class="daily-mission ${state.claimed?'completed':''}">
+      <div class="daily-mission-inner">
+        <div class="daily-mission-head">
+          <div><span class="daily-mission-kicker">DAILY MISSION</span><h3 class="daily-mission-title">Score 50 points today</h3></div>
+          <span class="daily-mission-reward">REWARD <b>+50 PTS</b></span>
+        </div>
+        <p class="daily-mission-copy">Complete practice answers and build your championship score.</p>
+        <div class="daily-mission-progress"><div class="daily-mission-track"><span style="width:${percent}%"></span></div><span class="daily-mission-count">${Math.min(state.earned,state.target)}/${state.target}</span></div>
+        ${state.claimed?'<div class="daily-mission-complete">✓ Mission complete · bonus claimed</div>':'<button class="daily-mission-action" type="button" onclick="startDailyMission()">START PRACTICE →</button>'}
+      </div>
+    </section>`;
+}
+
+function startDailyMission(){
+  openGenders();
+}
+
 function updateDashboardStats(){
   const vocabulary=document.getElementById('vocabulary-progress');
   const genders=document.getElementById('genders-progress');
@@ -39,6 +94,7 @@ function updateDashboardStats(){
   if(genders)genders.textContent=`${typeof getGrammarProgress==='function'?getGrammarProgress('genders'):0}%`;
   if(declension)declension.textContent=`${typeof getGrammarProgress==='function'?getGrammarProgress('declension'):0}%`;
   if(typeof renderDriverProgress==='function')renderDriverProgress();
+  updateDailyMission();
 }
 
 function renderPage(title,bodyHTML,extraClass=''){
