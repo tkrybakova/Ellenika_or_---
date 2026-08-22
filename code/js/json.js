@@ -35,9 +35,11 @@ function importJSON(event) {
         alert('Некоторые слова не имеют поля "greek". Проверьте формат.');
         return;
       }
-      if (!confirm(`Найдено ${imported.length} слов. Заменить текущий словарь?`)) return;
 
-      dictionary = imported.map(normalizeWord).filter(word => word.greek);
+      const uniqueImported = deduplicateWords(imported);
+      if (!confirm(`Найдено ${uniqueImported.length} уникальных слов. Заменить текущий словарь?`)) return;
+
+      applyDictionary(uniqueImported, false);
       saveWords();
       openDictionary();
       alert(`Словарь успешно заменён: ${dictionary.length} слов.`);
