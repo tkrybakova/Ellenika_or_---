@@ -40,18 +40,59 @@ function normalizeWord(word) {
   };
 }
 
+function vocabularyKey(greek) {
+  return String(greek || '')
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .trim()
+    .toLowerCase();
+}
+
+function deduplicateWords(words) {
+  const unique = new Map();
+
+  for (const rawWord of Array.isArray(words) ? words : []) {
+    const word = normalizeWord(rawWord);
+    if (!word.greek) continue;
+
+    const key = vocabularyKey(word.greek);
+    const existing = unique.get(key);
+
+    if (!existing) {
+      unique.set(key, word);
+      continue;
+    }
+
+    const groups = [...new Set([...(existing.groups || []), ...(word.groups || [])])];
+    unique.set(key, {
+      ...existing,
+      english: existing.english || word.english,
+      russian: existing.russian || word.russian,
+      article: existing.article || word.article,
+      plural: existing.plural || word.plural,
+      pluralArticle: existing.pluralArticle || word.pluralArticle,
+      gender: existing.gender || word.gender,
+      level: existing.level || word.level,
+      group: existing.group || word.group || groups[0] || '',
+      groups
+    });
+  }
+
+  return [...unique.values()];
+}
+
 function applyDictionary(words, preserveProgress = true) {
   const previous = new Map();
   if (preserveProgress) {
-    dictionary.forEach(word => previous.set(word.greek, word));
+    dictionary.forEach(word => previous.set(vocabularyKey(word.greek), word));
   }
 
-  dictionary = Array.isArray(words)
-    ? words.map(normalizeWord).filter(word => word.greek).map(word => {
-        const old = previous.get(word.greek);
-        return old ? { ...word, memoryLevel: old.memoryLevel, reviewCount: old.reviewCount, lastReviewed: old.lastReviewed } : word;
-      })
-    : [];
+  dictionary = deduplicateWords(words).map(word => {
+    const old = previous.get(vocabularyKey(word.greek));
+    return old
+      ? { ...word, memoryLevel: old.memoryLevel, reviewCount: old.reviewCount, lastReviewed: old.lastReviewed }
+      : word;
+  });
 }
 
 async function loadWords() {
@@ -65,18 +106,23 @@ async function loadWords() {
     console.warn('Не удалось прочитать локальный словарь:', error);
   }
 
-  // The bundled JSON is the source of vocabulary/grammar data.
-  // localStorage is used only for learning progress and imported dictionaries.
-  try {
-    const response = await fetch(DEFAULT_DICTIONARY_URL, { cache: 'no-store' });
-    if (!response.ok) throw new Error(`HTTP ${response.status}`);
-    const bundled = await response.json();
-    if (!Array.isArray(bundled) || !bundled.length) throw new Error('JSON dictionary is empty');
+  // The bundled JSON is the default vocabulary source. Existing local data
+  // is kept when present so imported dictionaries are not silently overwritten.
+  if (!dictionary.length) {
+    try {
+      const response = await fetch(DEFAULT_DICTIONARY_URL, { cache: 'no-store' });
+      if (!response.ok) throw new Error(`HTTP ${response.status}`);
+      const bundled = await response.json();
+      if (!Array.isArray(bundled) || !bundled.length) throw new Error('JSON dictionary is empty');
 
-    applyDictionary(bundled, true);
+      applyDictionary(bundled, false);
+      saveWords();
+    } catch (error) {
+      console.error('Ошибка загрузки встроенного словаря:', error);
+    }
+  } else {
+    // Also cleans up duplicates left by older versions of the app.
     saveWords();
-  } catch (error) {
-    if (!dictionary.length) console.error('Ошибка загрузки встроенного словаря:', error);
   }
 
   updateDashboardStats();
@@ -84,7 +130,7 @@ async function loadWords() {
 
 function saveWords() {
   try {
-    dictionary = dictionary.map(normalizeWord);
+    dictionary = deduplicateWords(dictionary);
     localStorage.setItem('greekWords', JSON.stringify(dictionary));
   } catch (error) {
     console.error('Ошибка сохранения словаря:', error);
