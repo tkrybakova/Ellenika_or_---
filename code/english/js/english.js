@@ -3,6 +3,7 @@
 // ============================================================
 
 function openEnglishDashboard() {
+  currentLanguage = 'english';
   clearGameState();
   showScreen('content-screen');
   const content = document.getElementById('content');
@@ -11,9 +12,8 @@ function openEnglishDashboard() {
     <div class="page-heading"><div class="page-eyebrow">ELLENIKA / ENGLISH / B1</div><h2>ENGLISH</h2></div>
     <div class="english-dashboard">
       <button class="english-module-card" onclick="openEnglishGrammar()"><span class="english-module-kicker">01</span><span><strong>GRAMMAR</strong><small>Tenses, structures and practice</small></span><b>→</b></button>
-      <button class="english-module-card" onclick="openEnglishSentencePractice()"><span class="english-module-kicker">02</span><span><strong>SENTENCE PRACTICE</strong><small>Build and check English sentences</small></span><b>→</b></button>
-      <button class="english-module-card" onclick="openEnglishTranslation()"><span class="english-module-kicker">03</span><span><strong>TRANSLATION</strong><small>Translate and learn from mistakes</small></span><b>→</b></button>
-      <button class="english-module-card" onclick="openEnglishWriting()"><span class="english-module-kicker">04</span><span><strong>WRITING</strong><small>Write freely with live grammar feedback</small></span><b>→</b></button>
+      <button class="english-module-card" onclick="openEnglishTranslation()"><span class="english-module-kicker">02</span><span><strong>TRANSLATION</strong><small>Translate and learn from mistakes</small></span><b>→</b></button>
+      <button class="english-module-card" onclick="openEnglishWriting()"><span class="english-module-kicker">03</span><span><strong>WRITING</strong><small>Write freely with live grammar feedback</small></span><b>→</b></button>
     </div>`;
 }
 
@@ -22,15 +22,12 @@ function openEnglishGrammar() {
 }
 
 function renderEnglishPage(title, bodyHTML) {
+  currentLanguage = 'english';
   clearGameState();
   showScreen('content-screen');
   const content = document.getElementById('content');
   if (!content) return;
   content.innerHTML = `<div class="page-heading"><div class="page-eyebrow">ELLENIKA / ENGLISH</div><h2>${escapeHtml(title)}</h2></div><div class="page-content english-page">${bodyHTML}</div>`;
-}
-
-function openEnglishSentencePractice() {
-  renderEnglishPage('SENTENCE PRACTICE', renderEnglishExerciseStart('sentence'));
 }
 
 function openEnglishTranslation() {
