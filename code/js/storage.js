@@ -4,7 +4,7 @@
 
 let dictionary = [];
 const VOCAB_LEVELS = ['A0', 'A1', 'A2', 'B1', 'B2', 'C1', 'C2'];
-const DEFAULT_DICTIONARY_URL = 'greek_dictionary.json';
+const DEFAULT_DICTIONARY_URL = 'greek/greek_dictionary.json';
 
 function normalizeGroups(word) {
   const raw = word.group ?? word.groups ?? [];
