@@ -1,0 +1,10 @@
+[
+  {"word":"swim","translation":"плавать","partOfSpeech":"verb","level":"A1","forms":{"base":"swim","past":"swam","participle":"swum","ing":"swimming"},"groups":["sports","daily life"]},
+  {"word":"school","translation":"школа","partOfSpeech":"noun","level":"A1","groups":["education"]},
+  {"word":"morning","translation":"утро","partOfSpeech":"noun","level":"A1","groups":["time","daily life"]},
+  {"word":"finish","translation":"заканчивать","partOfSpeech":"verb","level":"A1","forms":{"base":"finish","past":"finished","participle":"finished","ing":"finishing"},"groups":["daily life"]},
+  {"word":"work","translation":"работа","partOfSpeech":"noun","level":"A1","groups":["daily life"]},
+  {"word":"yesterday","translation":"вчера","partOfSpeech":"adverb","level":"A1","groups":["time"]},
+  {"word":"tomorrow","translation":"завтра","partOfSpeech":"adverb","level":"A1","groups":["time"]},
+  {"word":"pool","translation":"бассейн","partOfSpeech":"noun","level":"A1","groups":["sports"]}
+]
