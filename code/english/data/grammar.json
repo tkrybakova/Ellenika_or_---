@@ -1,14 +1,11 @@
 {
   "levels": {
-    "A1": ["present_simple", "present_continuous", "past_simple", "future_simple"],
-    "A2": ["present_perfect", "past_continuous"]
-  },
-  "topics": {
-    "present_simple": {"name":"Present Simple","level":"A1","structure":"subject + base verb","signals":["always","usually","often","sometimes","every day"]},
-    "present_continuous": {"name":"Present Continuous","level":"A1","structure":"subject + am/is/are + verb-ing","signals":["now","right now","at the moment"]},
-    "past_simple": {"name":"Past Simple","level":"A1","structure":"subject + past form","signals":["yesterday","last week","ago"]},
-    "future_simple": {"name":"Future Simple","level":"A1","structure":"subject + will + base verb","signals":["tomorrow","next week","probably"]},
-    "present_perfect": {"name":"Present Perfect","level":"A2","structure":"subject + have/has + past participle","signals":["already","just","ever","never","yet","since","for"]},
-    "past_continuous": {"name":"Past Continuous","level":"A2","structure":"subject + was/were + verb-ing","signals":["while","when"]}
+    "A0": ["be_basic", "pronouns_basic", "sentence_order", "articles_basic"],
+    "A1": ["present_simple", "present_continuous", "past_simple", "future_simple", "can_cant", "there_is_are"],
+    "A2": ["present_perfect", "past_continuous", "comparatives", "countable_uncountable", "going_to", "first_conditional"],
+    "B1": ["present_perfect_continuous", "past_perfect", "used_to", "second_conditional", "reported_speech", "passive_basic"],
+    "B2": ["future_continuous", "future_perfect", "third_conditional", "mixed_conditionals", "modal_perfects", "relative_clauses"],
+    "C1": ["inversion", "cleft_sentences", "advanced_modals", "subjunctive", "participle_clauses", "advanced_passive"],
+    "C2": ["advanced_conditionals", "nominalisation", "ellipsis", "advanced_emphasis", "discourse_grammar", "register"]
   }
 }
