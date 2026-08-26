@@ -1,0 +1,9 @@
+[
+  {"id":"ps-1","type":"translate","topic":"present_simple","source":"Я обычно плаваю по утрам.","accepted":["I usually swim in the morning.","I usually swim in the mornings."],"targetTense":"present_simple"},
+  {"id":"ps-2","type":"correct","topic":"present_simple","source":"She go to school every day.","expected":"She goes to school every day.","targetTense":"present_simple"},
+  {"id":"pc-1","type":"translate","topic":"present_continuous","source":"Я сейчас плаваю.","accepted":["I am swimming now.","I'm swimming now.","I am swimming right now.","I'm swimming right now."],"targetTense":"present_continuous"},
+  {"id":"past-1","type":"translate","topic":"past_simple","source":"Вчера я ходила в бассейн.","accepted":["I went to the pool yesterday.","Yesterday, I went to the pool."],"targetTense":"past_simple"},
+  {"id":"past-2","type":"correct","topic":"past_simple","source":"Yesterday I go swimming.","expected":"Yesterday I went swimming.","targetTense":"past_simple"},
+  {"id":"future-1","type":"translate","topic":"future_simple","source":"Я думаю, завтра будет дождь.","accepted":["I think it will rain tomorrow."],"targetTense":"future_simple"},
+  {"id":"pp-1","type":"translate","topic":"present_perfect","source":"Я уже закончила работу.","accepted":["I have already finished my work.","I've already finished my work."],"targetTense":"present_perfect"}
+]
