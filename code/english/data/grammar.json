@@ -1,0 +1,14 @@
+{
+  "levels": {
+    "A1": ["present_simple", "present_continuous", "past_simple", "future_simple"],
+    "A2": ["present_perfect", "past_continuous"]
+  },
+  "topics": {
+    "present_simple": {"name":"Present Simple","level":"A1","structure":"subject + base verb","signals":["always","usually","often","sometimes","every day"]},
+    "present_continuous": {"name":"Present Continuous","level":"A1","structure":"subject + am/is/are + verb-ing","signals":["now","right now","at the moment"]},
+    "past_simple": {"name":"Past Simple","level":"A1","structure":"subject + past form","signals":["yesterday","last week","ago"]},
+    "future_simple": {"name":"Future Simple","level":"A1","structure":"subject + will + base verb","signals":["tomorrow","next week","probably"]},
+    "present_perfect": {"name":"Present Perfect","level":"A2","structure":"subject + have/has + past participle","signals":["already","just","ever","never","yet","since","for"]},
+    "past_continuous": {"name":"Past Continuous","level":"A2","structure":"subject + was/were + verb-ing","signals":["while","when"]}
+  }
+}
