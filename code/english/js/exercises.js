@@ -18,13 +18,7 @@ function getEnglishExercises(topic = null, type = null) {
 
 function renderEnglishExerciseStart(type) {
   const label = type === 'translation' ? 'Translate the sentence into English.' : 'Build a correct English sentence.';
-  return `
-    <div class="english-exercise-start">
-      <span class="english-writing-label">PRACTICE</span>
-      <h3>${escapeHtml(label)}</h3>
-      <p>Choose a grammar topic to start.</p>
-      <div class="english-topic-grid">${ENGLISH_GRAMMAR_TOPICS.map(topic => `<button class="english-topic-card" onclick="startEnglishExerciseForTopic('${topic.id}', '${type}')"><span>${escapeHtml(topic.level)}</span><strong>${escapeHtml(topic.name)}</strong></button>`).join('')}</div>
-    </div>`;
+  return `<div class="english-exercise-start"><span class="english-writing-label">PRACTICE</span><h3>${escapeHtml(label)}</h3><p>Choose a grammar topic to start.</p><div class="english-topic-grid">${ENGLISH_GRAMMAR_TOPICS.map(topic => `<button class="english-topic-card" onclick="startEnglishExerciseForTopic('${topic.id}', '${type}')"><span>${escapeHtml(topic.level)}</span><strong>${escapeHtml(topic.name)}</strong></button>`).join('')}</div></div>`;
 }
 
 function startEnglishExerciseForTopic(topic, mode = null) {
@@ -36,28 +30,30 @@ function startEnglishExerciseForTopic(topic, mode = null) {
 
 function renderEnglishExercise(exercise, index, pool) {
   const prompt = exercise.type === 'correct' ? 'Correct the sentence.' : 'Translate into English.';
-  const source = exercise.type === 'correct' ? exercise.source : exercise.source;
   renderEnglishPage('PRACTICE', `
     <div class="english-exercise" data-exercise-id="${escapeHtml(exercise.id)}">
       <div class="english-exercise-progress">${index + 1} / ${pool.length}</div>
       <span class="english-writing-label">${escapeHtml(prompt)}</span>
-      <div class="english-prompt">${escapeHtml(source)}</div>
+      <div class="english-prompt">${escapeHtml(exercise.source)}</div>
       <textarea id="english-answer" rows="3" placeholder="Write your answer..."></textarea>
+      <div id="english-exercise-feedback"></div>
       <div class="english-action-row">
         <button class="english-secondary-button" onclick="showEnglishHint('${exercise.id}')">HINT</button>
         <button class="english-primary-button" onclick="submitEnglishExercise(${index}, ${JSON.stringify(pool).replace(/</g, '\\u003c')})">CHECK →</button>
       </div>
-      <div id="english-exercise-feedback"></div>
     </div>`);
+  attachEnglishLiveChecker('english-answer', 'english-exercise-feedback', exercise);
 }
 
-function submitEnglishExercise(index, pool) {
+async function submitEnglishExercise(index, pool) {
   const exercise = pool[index];
   const input = document.getElementById('english-answer');
   const feedback = document.getElementById('english-exercise-feedback');
   if (!exercise || !input || !feedback) return;
-  const result = checkEnglishSentence(input.value, exercise);
-  feedback.innerHTML = renderEnglishFeedback(result);
+  feedback.innerHTML = '<div class="english-live-status">CHECKING…</div>';
+  const result = await analyzeEnglishSentence(input.value, exercise);
+  recordEnglishResult(exercise.topic, result);
+  feedback.innerHTML = renderEnglishLiveFeedback(result);
 }
 
 function showEnglishHint(exerciseId) {
