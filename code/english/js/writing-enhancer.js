@@ -1,5 +1,5 @@
 // Writing Enhancer — non-destructive suggestions for vocabulary and phrasing.
-// This first layer is intentionally local: it never silently changes user text.
+// Suggestions are local for now. User text is never silently changed.
 
 const ENGLISH_WRITING_PHRASES = [
   { pattern:/\bvery good\b/gi, original:'very good', natural:'great', b2:'excellent', c1:'highly effective', reason:'More precise adjective.' },
@@ -19,45 +19,55 @@ const ENGLISH_SYNONYMS = {
   good:['great','excellent','effective','beneficial'], bad:['poor','negative','problematic','unsatisfactory'], important:['significant','essential','crucial','fundamental'], interesting:['engaging','fascinating','compelling','intriguing'], like:['enjoy','appreciate','be fond of','value'], think:['believe','consider','argue','maintain'], big:['large','huge','considerable','substantial'], small:['little','minor','limited','modest'], help:['assist','support','facilitate','contribute to'], show:['demonstrate','illustrate','indicate','highlight'], use:['employ','apply','utilise','implement'], get:['receive','obtain','acquire','gain']
 };
 
-function getWritingPhraseSuggestions(text) {
-  const value=String(text||'');
-  const results=[];
-  ENGLISH_WRITING_PHRASES.forEach(item=>{ if(item.pattern.test(value)){ item.pattern.lastIndex=0; results.push({...item}); } item.pattern.lastIndex=0; });
+function getWritingPhraseSuggestions(text){
+  const value=String(text||''), results=[];
+  ENGLISH_WRITING_PHRASES.forEach(item=>{ item.pattern.lastIndex=0; if(item.pattern.test(value)) results.push({...item}); item.pattern.lastIndex=0; });
   return results;
 }
 
-function getWritingSynonymSuggestions(text) {
-  const value=String(text||'').toLowerCase();
-  const found=[];
+function getWritingSynonymSuggestions(text){
+  const value=String(text||'').toLowerCase(), found=[];
   Object.entries(ENGLISH_SYNONYMS).forEach(([word,synonyms])=>{
-    const regex=new RegExp(`\\b${word.replace(/[.*+?^${}()|[\\]\\]/g,'\\$&')}\\b`,'i');
-    if(regex.test(value)) found.push({word,synonyms});
+    const escaped=word.replace(/[.*+?^${}()|[\]\\]/g,'\\$&');
+    if(new RegExp(`\\b${escaped}\\b`,'i').test(value)) found.push({word,synonyms});
   });
   return found;
 }
 
-function renderWritingEnhancements(text) {
-  const phrases=getWritingPhraseSuggestions(text);
-  const synonyms=getWritingSynonymSuggestions(text);
-  if(!phrases.length && !synonyms.length) return '';
-  let html='<div class="writing-enhancements"><div class="writing-enhancements-title">IMPROVE YOUR ENGLISH</div>';
-  phrases.forEach(item=>{
-    html+=`<div class="writing-enhancement"><div class="writing-enhancement-type">BETTER PHRASING</div><div class="writing-original">${escapeHtml(item.original)}</div><div class="writing-options"><button onclick="replaceWritingPhrase('${escapeHtml(item.original)}','${escapeHtml(item.natural)}')">${escapeHtml(item.natural)}</button><button onclick="replaceWritingPhrase('${escapeHtml(item.original)}','${escapeHtml(item.b2)}')">B2 · ${escapeHtml(item.b2)}</button><button onclick="replaceWritingPhrase('${escapeHtml(item.original)}','${escapeHtml(item.c1)}')">C1 · ${escapeHtml(item.c1)}</button></div><small>${escapeHtml(item.reason)}</small></div>`;
-  });
-  synonyms.forEach(item=>{
-    html+=`<div class="writing-enhancement"><div class="writing-enhancement-type">SYNONYMS · ${escapeHtml(item.word.toUpperCase())}</div><div class="writing-options">${item.synonyms.map(word=>`<button onclick="replaceWritingWord('${escapeHtml(item.word)}','${escapeHtml(word)}')">${escapeHtml(word)}</button>`).join('')}</div></div>`;
-  });
-  html+='</div>';
-  return html;
-}
-
-function replaceWritingPhrase(original,replacement){ replaceFirstWritingText(original,replacement); }
-function replaceWritingWord(original,replacement){ replaceFirstWritingText(original,replacement); }
-function replaceFirstWritingText(original,replacement){
-  const input=document.getElementById('english-writing-input'); if(!input)return;
-  const regex=new RegExp(`\\b${String(original).replace(/[.*+?^${}()|[\\]\\]/g,'\\$&')}\\b`,'i');
+function replaceWritingText(original,replacement){
+  const input=document.getElementById('english-writing-input');
+  if(!input)return;
+  const escaped=String(original).replace(/[.*+?^${}()|[\]\\]/g,'\\$&');
+  const regex=new RegExp(`\\b${escaped}\\b`,'i');
   input.value=input.value.replace(regex,replacement);
   input.dispatchEvent(new Event('input',{bubbles:true}));
 }
+function replaceWritingPhrase(original,replacement){replaceWritingText(original,replacement);}
+function replaceWritingWord(original,replacement){replaceWritingText(original,replacement);}
 
-function renderWritingImprovementBlock(text){ return renderWritingEnhancements(text); }
+function renderWritingEnhancements(text){
+  const phrases=getWritingPhraseSuggestions(text), synonyms=getWritingSynonymSuggestions(text);
+  if(!phrases.length&&!synonyms.length)return '';
+  let html='<div class="writing-enhancements"><div class="writing-enhancements-title">IMPROVE YOUR ENGLISH</div>';
+  phrases.forEach(item=>{
+    html+=`<div class="writing-enhancement"><div class="writing-enhancement-type">BETTER PHRASING</div><div class="writing-original">${escapeHtml(item.original)}</div><div class="writing-options">
+      <button type="button" onclick="replaceWritingPhrase(${JSON.stringify(item.original)},${JSON.stringify(item.natural)})">${escapeHtml(item.natural)}</button>
+      <button type="button" onclick="replaceWritingPhrase(${JSON.stringify(item.original)},${JSON.stringify(item.b2)})">B2 · ${escapeHtml(item.b2)}</button>
+      <button type="button" onclick="replaceWritingPhrase(${JSON.stringify(item.original)},${JSON.stringify(item.c1)})">C1 · ${escapeHtml(item.c1)}</button>
+    </div><small>${escapeHtml(item.reason)}</small></div>`;
+  });
+  synonyms.forEach(item=>{
+    html+=`<div class="writing-enhancement"><div class="writing-enhancement-type">SYNONYMS · ${escapeHtml(item.word.toUpperCase())}</div><div class="writing-options">${item.synonyms.map(word=>`<button type="button" onclick="replaceWritingWord(${JSON.stringify(item.word)},${JSON.stringify(word)})">${escapeHtml(word)}</button>`).join('')}</div></div>`;
+  });
+  return html+'</div>';
+}
+
+function renderWritingImprovementBlock(text){return renderWritingEnhancements(text);}
+
+// english.js currently creates the textarea dynamically, so use delegated input handling.
+document.addEventListener('input',event=>{
+  if(event.target&&event.target.id==='english-writing-input'){
+    const target=document.getElementById('english-writing-enhancements');
+    if(target)target.innerHTML=renderWritingImprovementBlock(event.target.value);
+  }
+});
