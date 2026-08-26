@@ -13,12 +13,13 @@
   <link rel="stylesheet" href="greek/practice-f1.css">
   <link rel="stylesheet" href="greek/pronouns.css">
   <link rel="stylesheet" href="greek/pronoun-hints.css">
+  <link rel="stylesheet" href="english/css/english.css">
 </head>
 <body>
   <main class="app-shell">
     <section id="home-screen" class="home-screen" aria-label="Choose language">
       <div class="brand-line">ELLENIKA</div>
-      <button class="language-link english-link" onclick="showLanguageMessage('English B1')"><span>ENGLISH</span><strong>COMING SOON</strong></button>
+      <button class="language-link english-link" onclick="openEnglishDashboard()"><span>ENGLISH</span><strong>B1 · START RACE</strong></button>
       <button class="language-link greek-link" onclick="openGreekDashboard()"><span>GREEK</span><strong>A1 · START RACE</strong></button>
       <div class="choose-language" aria-hidden="true"><span>LIGHTS</span><span>OUT</span></div>
       <div class="home-footer">YOUR LANGUAGE · YOUR LAP · YOUR POINTS <span>•</span> ELLENIKA</div>
@@ -40,7 +41,7 @@
       </div>
     </section>
     <section id="content-screen" class="content-screen hidden" aria-live="polite">
-      <button class="back-button content-back" onclick="openGreekDashboard()" aria-label="Back to Greek dashboard">←</button>
+      <button class="back-button content-back" onclick="openGreekDashboard()" aria-label="Back to language dashboard">←</button>
       <div id="content"></div>
     </section>
     <aside id="f1-broadcast" class="f1-broadcast hidden" aria-live="polite" aria-label="F1 live broadcast message"></aside>
@@ -59,6 +60,11 @@
   <script src="greek/js/declension.js"></script>
   <script src="greek/js/adjectives.js"></script>
   <script src="greek/js/pronouns.js"></script>
+  <script src="english/js/grammar.js"></script>
+  <script src="english/js/sentence-checker.js"></script>
+  <script src="english/js/english-storage.js"></script>
+  <script src="english/js/exercises.js"></script>
+  <script src="english/js/english.js"></script>
   <script src="js/timer.js"></script>
   <script src="js/f1.js"></script>
   <script>loadWords().then(() => initStudyTools());</script>
